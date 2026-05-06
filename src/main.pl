@@ -1,7 +1,8 @@
 :- dynamic(jumlahPemain/1).
 :- dynamic(listpemain/4). /* (Id, Nama, ListKartu, ListWarna) */
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
-kartu([0,1,2,3,4,5,6,7,8,9,'skip','reverse','drawtwo','wild','wilddrawfour'], ['merah','kuning','hijau','biru']).
+:- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
+:- include('file1.pl').
 
 get_element([Element|_], 0, Element).
 get_element([_|Tail], Index, Element) :- Index > 0, NI is Index - 1, get_element(Tail, NI, Element).
@@ -40,6 +41,16 @@ buat_list(X, X, [X|T]) :-
     X1 is X - 1, 
     buat_list(X1, X1, T).
 
+start_kartu(0).
+start_kartu(XValid):-
+    XValid > 0,
+    listpemain(XValid, Nama, _, _),
+    ambil_7_kali(KartuBaru, WarnaBaru, 7),
+    retract(listpemain(XValid, Nama, _, _)),
+    assertz(listpemain(XValid, Nama, KartuBaru, WarnaBaru)),
+    X1 is XValid - 1,
+    start_kartu(X1).
+
 printurutan([T]) :- 
     listpemain(T, Nama, _, _), 
     write(Nama), 
@@ -57,11 +68,18 @@ startGame :-
     nl,
     X1 is XValid - 1,
     input_pemain(X1, XValid),
-    buat_list(XValid, XValid, R),
-    permutation(R, R1),
-    assertz(urutanGiliran(R1)),
-    write('Urutan pemain: '),
-    printurutan(R1).
+    buat_list(XValid, XValid, R), 
+    permutation(R, R1), !, 
+    assertz(urutanGiliran(R1)), 
+    write('Urutan pemain: '), 
+    printurutan(R1),
+    start_kartu(XValid),
+    write('Setiap pemain mendapatkan 7 kartu acak'), nl,
+    ambil_kartu_top(A, B),
+    assertz(top_card(A, B)),
+    write('Kartu discard top: '), write(B), write('-'), write(A), nl,
+    write('Giliran '), get_element(R1, 0, C), listpemain(C, N, _, _), write(N), write('.'),nl.
+
 
     
     
