@@ -68,6 +68,7 @@ startGame :-
     nl,
     X1 is XValid - 1,
     input_pemain(X1, XValid),
+    assertz(jumlahPemain(XValid)),
     buat_list(XValid, XValid, R), 
     permutation(R, R1), !, 
     assertz(urutanGiliran(R1)), 
@@ -79,6 +80,31 @@ startGame :-
     assertz(top_card(A, B)),
     write('Kartu discard top: '), write(B), write('-'), write(A), nl,
     write('Giliran '), get_element(R1, 0, C), listpemain(C, N, _, _), write(N), write('.'),nl.
+
+count([],0).
+count([_|T], X) :- count(T, X1), X is X1 + 1.
+
+cetakpemain(0).
+cetakpemain(X):- 
+    X > 0,
+    X1 is X - 1,
+    cetakpemain(X1),
+    listpemain(X, Y, Z, _),
+    write('Nama pemain '),
+    write(X), write(': '), write(Y), nl,
+    count(Z, N),
+    write('Jumlah kartu : '), write(N), nl, nl.
+
+cekInfo :-
+    top_card(X, Y), !,
+    write('Kartu discard top: '),
+    write(X), write('-'), write(Y), write(.),nl,nl,
+    write('Urutan pemain: '),
+    urutanGiliran(Z),
+    printurutan(Z), nl, nl,
+    jumlahPemain(P),
+    cetakpemain(P).
+
 
 
     
