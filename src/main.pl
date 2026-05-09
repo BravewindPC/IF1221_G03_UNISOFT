@@ -2,7 +2,9 @@
 :- dynamic(listpemain/4). /* (Id, Nama, ListKartu, ListWarna) */
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
+:- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
 :- include('file1.pl').
+statusEfek(off).
 
 get_element([Element|_], 0, Element).
 get_element([_|Tail], Index, Element) :- Index > 0, NI is Index - 1, get_element(Tail, NI, Element).
@@ -78,6 +80,7 @@ startGame :-
     write('Setiap pemain mendapatkan 7 kartu acak'), nl,
     ambil_kartu_top(A, B),
     assertz(top_card(A, B)),
+    /*print */
     write('Kartu discard top: '), write(B), write('-'), write(A), nl,
     write('Giliran '), get_element(R1, 0, C), listpemain(C, N, _, _), write(N), write('.'),nl.
 
@@ -105,9 +108,72 @@ cekInfo :-
     jumlahPemain(P),
     cetakpemain(P).
 
+ambilKartu:-
+    /*liat kartu paling atas, kalo +2, ambil 2 kartu. perlu akses urutan turn dan tumpukan paling atas*/
+    statusEfek(on),
+    urutanGiliran([X|_]),
+    listpemain(X, _, _, _),
+    top_card(Kartu, _),
+    Kartu = drawtwo, !,
+    ambilKartu(X, 2).
+
+ambilKartu:-
+    /*jika +4 maka ambil 4 kartu*/
+    statusEfek(on),
+    urutanGiliran([X|_]),
+    listpemain(X, _, _, _),
+    top_card(Kartu, _),
+    Kartu = wilddrawfour, !,
+    ambilKartu(X, 4).
+
+ambilKartu:- 
+    /*jika bukan +2/+4 maka ambil 1 kartu*/
+    urutanGiliran([X|_]), 
+    listpemain(X, _, _, _),
+    ambilKartu(X, 1).
 
 
-    
-    
+ambilKartu(Id, JumlahKartu) :-
+    listpemain(Id, Nama, K_Lama, W_Lama),
+    ambilKartu(JumlahKartu, K_Baru, W_Baru),
+    write(Nama), write(' mendapatkan '), write(JumlahKartu), write(' dengan rincian:'),
+    printKartu(K_Baru, W_Baru), nl,
+    append(K_Lama, K_Baru, K_Total),
+    append(W_Lama, W_Baru, W_Total),
+    retract(listpemain(Id, Nama, K_Lama, W_Lama)),
+    assertz(listpemain(Id, Nama, K_Total, W_Total)),
+    matikan_status_efek,
+    putarGiliran, 
+    urutanGiliran(UrutanBaru),
+    write('Urutan pemain: '),
+    printurutan(UrutanBaru), nl,
+    UrutanBaru = [NextId|_],
+    listpemain(NextId, NamaNext, _, _),
+    write('Giliran '), write(NamaNext), write('.'), nl.
 
-    
+matikan_status_efek :- 
+    statusEfek(on), 
+    retract(statusEfek(on)), 
+    assertz(statusEfek(off)), !.
+matikan_status_efek.
+
+
+ambilKartu(0, [], []) :- !.
+ambilKartu(N, [K|SisaK], [W|SisaW]) :-
+    N > 0,
+    ambil_kartu_acak(K, W),
+    N1 is N - 1,
+    ambilKartu(N1, SisaK, SisaW).
+
+printKartu([], []).
+printKartu([K|SisaK], [W|SisaW]) :-
+    write(W), write('-'), write(K),
+    printKoma(SisaK),
+    printKartu(SisaK, SisaW).
+printKoma([_|_]) :- write(', ').
+printKoma([]).
+
+putarGiliran :-
+    retract(urutanGiliran([H|T])),
+    append(T, [H], UrutanBaru),
+    assertz(urutanGiliran(UrutanBaru)).
