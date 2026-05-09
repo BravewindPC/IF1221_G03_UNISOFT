@@ -177,3 +177,16 @@ putarGiliran :-
     retract(urutanGiliran([H|T])),
     append(T, [H], UrutanBaru),
     assertz(urutanGiliran(UrutanBaru)).
+
+lihatKartu :-
+    urutanGiliran([IdPemain|_]),
+    listpemain(IdPemain, _, ListKartu, ListWarna),
+    write('Berikut kartu yang anda miliki.'), nl,
+    tampilkanKartu(ListKartu, ListWarna, 1).
+
+tampilkanKartu([], [], _).
+tampilkanKartu([Kartu|TK], [Warna|TW], N) :-
+    write(N), write('. '),
+    write(Warna), write('-'), write(Kartu), nl,
+    N1 is N + 1,
+    tampilkanKartu(TK, TW, N1).
