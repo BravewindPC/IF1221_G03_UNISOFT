@@ -1,5 +1,4 @@
-:- dynamic(top_card_sebelumnya/2)
-
+:- dynamic(top_card_sebelumnya/2).
 
 /*
 Notes:
@@ -8,65 +7,62 @@ Notes:
 - tantang belum diimplementasikan
 */
 
-
 top_card_sebelumnya(a,b).
-cekList(X1, Y1, [X1|_], [Y1|_], idx):- !.
-cekList(X1,Y1, [], [], -1):- !.
-cekList(X1, Y1, [H1|T1], [H2|T2], idx):-
-    I is idx+1,
-    cekList(X1, Y1, T1, T2, i).
+cekList(X1, Y1, [X1|_], [Y1|_], 0):- !.
+cekList(_,_, [], [], -1):- !.
+cekList(X1, Y1, [_|T1], [_|T2], Idx):-
+    I is Idx+1,
+    cekList(X1, Y1, T1, T2, I).
 
 
-removeListIdx([H1|T1], [H2|T2], T1, T2, 0):- !.
-removeListIdx([H1|T1], [H2|T2], X, Y, idx):-
-    I is idx-1,
+removeListIdx([_|T1], [_|T2], T1, T2, 0).
+removeListIdx([H1|T1], [H2|T2], X, Y, Idx):-
+    Idx>0,
+    I is Idx-1,
     removeListIdx(T1, T2, X1, Y1, I),
     insert_head(H1,X1,X),
     insert_head(H2,Y1,Y).
 
-
 cekKartuValid(K):-
     urutanGiliran(R1),
-    top_card(A, B),
-    get_element(R1, 0, C), listpemain(C, N, X, Y),
-jumlahElemenList(X,S)
+    get_element(R1, 0, C), listpemain(C, _, X, _),
+    jumlahElemenList(X,S),
     K>=1,
     K<S.
 
-
 cekAngka(X1):-
-X1>0,
-X1<10,
-putarGiliran.
+    X1>0,
+    X1<10,
+    putarGiliran.
 cekAngka(_).
 
 
 cekSkip(X1):-
-    X1 :== 'skip',
+    X1 == 'skip',
     putarGiliran,
     putarGiliran.
 cekSkip(_).
 
 
 cekReverse(X1):-
-    X1 :== 'reverse',
+    X1 == 'reverse',
     urutanGiliran([H|T]),
     reverse_list([H|T],R),
-    retract(urutanGiliran(_|_)),
+    retract(urutanGiliran(_)),
     appendx(urutanGiliran(R)).
 cekReverse(_,_).
 
 
 cekWild(X1,Y1):-
-X1 :== ‘wild’,
-write(‘Pilih warna’),
-read(Y1),
-putarGiliran.
+    X1 == 'wild',
+    write('Pilih warna'),
+    read(Y1),
+    putarGiliran.
 cekWild(_,_).
 
 
 cekDrawTwo(X1):-
-    X1 :== 'drawtwo',
+    X1 == 'drawtwo',
     retract(statusEfek(_)),
     appendx(statusEfek(on)),
     ambilKartu,
@@ -75,8 +71,8 @@ cekDrawTwo(_).
 
 
 cekDrawFour(X1,Y1):-
-    X1 :== 'wilddrawfour',
-    write(‘Pilih warna’),
+    X1 == 'wilddrawfour',
+    write('Pilih warna'),
     read(Y1),
     retract(statusEfek(_)),
     appendx(statusEfek(on)),
@@ -87,9 +83,9 @@ cekDrawFour(_).
 cekKartu(A, B, _, Y1):-
     A>0,
     A<10,
-    B :== Y1,
+    B == Y1,
     !.
-cekKartu(A, B, X1, _):-
+cekKartu(A, _, X1, _):-
     A>0,
     A<10,
     A =:= X1,
@@ -97,63 +93,63 @@ cekKartu(A, B, X1, _):-
 
 
 cekKartu(A, _, X1, _):-
-    A :== 'skip',
-    A :== X1,
+    A == 'skip',
+    A == X1,
     !.
 cekKartu(A, B, _, Y1):-
-    A :== 'skip',
-    B :== Y1,
+    A == 'skip',
+    B == Y1,
     !.
 
 
 cekKartu(A, _, X1, _):-
-    A :== 'reverse',
-    A :== X1,
+    A == 'reverse',
+    A == X1,
     !.
 cekKartu(A, B, _, Y1):-
-    A :== 'reverse',
-    B :== Y1,
+    A == 'reverse',
+    B == Y1,
     !.
 
 
 cekKartu(A, B, X1, Y1):-
-    A :== 'drawtwo'
-    A /== X1,
-    B :== Y1,
+    A == 'drawtwo',
+    A \== X1,
+    B == Y1,
     !.
 
 
 cekKartu(A, B, X1, Y1):-
-    A :== 'wild',
-    A /== X1,
-    B :== Y1,
+    A == 'wild',
+    A \== X1,
+    B == Y1,
     !.
 
 
 cekKartu(A, B, X1, Y1):-
-    A :== 'wilddrawfour',
-    A /== X1,
-    B :== Y1,
+    A == 'wilddrawfour',
+    A \== X1,
+    B == Y1,
     !.
 
 
 cekKartu(A, _, X1, _):-
-    X1 :== 'wild',
-    A /== 'wild',
+    X1 == 'wild',
+    A \== 'wild',
     !.
 
 
 cekKartu(A, _, X1, _):-
-    X1 :== 'wilddrawfour',
-    A /== 'wilddrawfour',
+    X1 == 'wilddrawfour',
+    A \== 'wilddrawfour',
     !.
 
 
 mainkanKartu(_):-
-statusEfek(on),
-write(‘Perintah tidak valid.’),
-!,
-nl.
+    statusEfek(on),
+    write('Perintah tidak valid.'),
+    !,
+    nl.
 mainkanKartu(K):-
     \+cekKartuValid(K),
     write('Kartu tidak valid!'),
@@ -162,7 +158,7 @@ mainkanKartu(K):-
 mainkanKartu(K):-
     urutanGiliran(R1),
     top_card(A, B),
-    get_element(R1, U1, C), listpemain(C, N, X, Y),
+    get_element(R1, 0, C), listpemain(C, _, X, Y),
     cekKartuValid(K),
     get_element(X,K,X1),
     get_element(Y,K,Y1),
@@ -173,7 +169,7 @@ mainkanKartu(K):-
 mainkanKartu(K):-
     urutanGiliran(R1),
     top_card(A, B),
-    get_element(R1, U1, C), listpemain(C, N, X, Y),
+    get_element(R1, 0, C), listpemain(C, N, X, Y),
     cekKartuValid(K),
     get_element(X,K,X1),
     get_element(Y,K,Y1),
@@ -182,7 +178,7 @@ mainkanKartu(K):-
     write(N), write(' memainkan kartu:'),
     write(X1), write('-'), write(Y1),
     nl,
-    removeListIdx(X, Y, X1, Y1, K).
+    removeListIdx(X, Y, X1, Y1, K),
     retract(listpemain(C,N,_,_)),
     appendx(listpemain(C,N,X,Y)),
     cekAngka(X1),
@@ -205,29 +201,26 @@ listkosong([_|_],[_|_],0).
 
 
 jumlahElemenList([],0).
-jumlahElemenList([H|T],Sum):-
+jumlahElemenList([_|T],Sum):-
     Sum is S1+1,
     jumlahElemenList(T,S1).
 
 
 cekSemuaKartu(_,_,_,_,N,N).
 cekSemuaKartu(A,B,X,Y,Count,N):-
-getElement(X,Count,X1),
-getElement(Y,Count,Y1),
-cekKartu(A,B,X1,Y1),
-C1 is Count+1,
-cekSemuaKartu(A,B,X,Y,C1,N).
-cekSemuaKartu(A,B,X,Y,Count,N):-
-getElement(X,Count,X1),
-getElement(Y,Count,Y1),
-\+cekKartu(A,B,X1,Y1),
-!,
-fail.
+    getElement(X,Count,X1),
+    getElement(Y,Count,Y1),
+    cekKartu(A,B,X1,Y1),
+    Count is Count+1,
+    cekSemuaKartu(A,B,X,Y,Count,N).
+cekSemuaKartu(A,B,X,Y,Count,_):-
+    getElement(X,Count,X1),
+    getElement(Y,Count,Y1),
+    \+cekKartu(A,B,X1,Y1),
+    !,
+    fail.
 
-
-
-
-cekMain(_,_,_,Count):
+cekMain(_,_,_,Count):-
     statusEfek(on),
     !,
     Count is 1.
@@ -243,12 +236,11 @@ cekMain(_,X,Y,Count):-
     !,
     write('1. mainKartu'), nl,
     Count is 2.
-cekMain(_,_,_,_):-
+cekMain(_,_,_,Count):-
     Count is 1.
 
-
 cekTantang(A, Count):-
-    A :== 'wilddrawfour',
+    A == 'wilddrawfour',
     write(Count), write('. tantang'), nl,
     Count is Count+1.
 cekTangkap(_,_).
@@ -288,7 +280,7 @@ lihatCommand:-
     cekTangkap(0,Count,N),
     write('Aksi pendukung yang tersedia:'), nl,
     write('1. lihatCommand'), nl,
-    write('2. lihatKartu'), nl
+    write('2. lihatKartu'), nl,
     write('3. cekInfo'), nl.
 
 
@@ -297,7 +289,7 @@ cekKartuSaja(_,_,_,_,[],[]): !, fail.
 cekKartuSaja(A, B, X1, Y1, X, Y):-
     A>0,
     A<10,
-    B :== Y1,
+    B == Y1,
     !.
 cekKartuSaja(A, B, X1, Y1, X, Y):-
     A>0,
@@ -307,41 +299,41 @@ cekKartuSaja(A, B, X1, Y1, X, Y):-
 
 
 cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'skip',
-    A :== X1,
+    A == 'skip',
+    A == X1,
     !.
 cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'skip',
-    B :== Y1,
-    !.
-
-
-cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'reverse',
-    A :== X1,
-    !.
-cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'reverse',
-    B :== Y1,
+    A == 'skip',
+    B == Y1,
     !.
 
 
 cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'drawtwo'
-    A /== X1,
-    B :== Y1,
+    A == 'reverse',
+    A == X1,
+    !.
+cekKartuSaja(A, B, X1, Y1, X, Y):-
+    A == 'reverse',
+    B == Y1,
     !.
 
 
 cekKartuSaja(A, B, X1, Y1, X, Y):-
-    A :== 'wild',
-    A /== X1,
-    B :== Y1,
+    A == 'drawtwo'
+    A \== X1,
+    B == Y1,
+    !.
+
+
+cekKartuSaja(A, B, X1, Y1, X, Y):-
+    A == 'wild',
+    A \== X1,
+    B == Y1,
     !.
 
 
 cekKartuSaja(A, B, X1, Y1, [H1|T1], [H2|T2]):-
-    cekKartuSaja(A, B, H1, H2, idx, T1, T2).
+    cekKartuSaja(A, B, H1, H2, Idx, T1, T2).
 
 
 get_head([H|T],H).
@@ -365,7 +357,7 @@ tantang:-
     get_element(R1, U2, C), listpemain(C, N, X, Y),
     get_head(X,X1),
     get_head(Y,Y1).
-    A :== 'wilddrawfour',
+    A == 'wilddrawfour',
     write('Tantangan dilakukan!'),
     nl,
     nl,
