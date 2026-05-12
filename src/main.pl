@@ -480,16 +480,11 @@ cekUni(X,Count, Out):-
 cekUni(_,Count,Count).
 
 
-    urutanGiliran(R1),
-    get_element(R1, I, C), listpemain(C, _, X, _),
-    jumlahElemenList(X, Sum),
-    ceksatu(Sum),
-    !,
-    write(Count), write('. tangkap'), nl.
-cekTangkap(I,Count,N):-
-    I1 is I+1,
-    cekTangkap(I1,Count,N).
-
+cekTangkap(O2):-
+    \+statusEfek(on).
+    write(Count), write('. ambilKartu'), nl.
+cekTangkap(_):-
+    statusEfek(on).
 
 lihatCommand:-
     urutanGiliran(R1),
