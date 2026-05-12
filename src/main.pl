@@ -480,7 +480,6 @@ cekUni(X,Count, Out):-
 cekUni(_,Count,Count).
 
 
-ceksatu(1).
 cekTangkap(N,_,N):- !.
 cekTangkap(I,Count,_):-
     urutanGiliran(R1),
@@ -506,7 +505,6 @@ lihatCommand:-
     C1 is Count+1,
     cekTantang(A, C1, O1),
     cekUni(X,O1,O2),
-    cekTangkap(1,O2,N),
     nl,
     write('Aksi pendukung yang tersedia:'), nl,
     write('1. lihatCommand'), nl,
