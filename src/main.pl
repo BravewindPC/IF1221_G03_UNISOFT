@@ -223,12 +223,12 @@ validasiwarna('merah').
 validasiwarna('biru').
 validasiwarna('kuning').
 validasiwarna('hijau').
-pilihWarna(Y, _):-
+pilihWarna(Y, Z):-
     \+validasiwarna(Y),
     nl,
     write('Warna tidak valid, input lagi:'),
     read(Y1),
-    pilihWarna(Y1, _).
+    pilihWarna(Y1, Z).
 pilihWarna(Y, Y):-
     validasiwarna(Y).
     
