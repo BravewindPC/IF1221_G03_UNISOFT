@@ -4,6 +4,7 @@
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
+:- dynamic(urutantetap/2).
 :- include('file1.pl').
 statusEfek(off).
 
@@ -75,6 +76,7 @@ startGame :-
     buat_list(XValid, XValid, R), 
     permutation(R, R1), !, 
     assertz(urutanGiliran(R1)), 
+    assertz(urutantetap(R1,'kanan')),
     write('Urutan pemain: '), 
     printurutan(R1),
     start_kartu(XValid),
@@ -258,6 +260,10 @@ cekSkip(_,_).
 
 cekReverse(X1,Y1):-
     X1 == 'reverse',
+    urutantetap(R1,Arah),
+    (Arah = 'kanan' -> Arah1 = 'kiri'; Arah1 = 'kanan'),
+    retract(urutantetap(_,_)),
+    asserta(urutantetap(R1,Arah1)),
     urutanGiliran([H|T]),
     reverse_list([H|T],R),
     retract(urutanGiliran(_)),
