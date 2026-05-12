@@ -429,7 +429,7 @@ jumlahElemenList([_|T],Sum):-
     Sum is S1+1.
 
 ceksalah(1).
-cekSemuaKartu(_,_,_,_,N,N): -!, ceksalah(0).
+cekSemuaKartu(_,_,_,_,N,N):- !, ceksalah(0).
 cekSemuaKartu(A,B,X,Y,Count,N):-
     get_element(X,Count,X1),
     get_element(Y,Count,Y1),
