@@ -5,6 +5,7 @@
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
 :- dynamic(urutantetap/2).
+:- dynamic(poin/2).
 :- include('file1.pl').
 statusEfek(off).
 
@@ -35,6 +36,7 @@ input_pemain(X, Y) :-
     write(': '),
     read(Z),
     cek_nama(Z, Z1),
+    asserta(poin(Z1, 0)),
     assertz(listpemain(Y1, Z1, [], [])),
     X1 is X - 1,
     input_pemain(X1, Y).
@@ -420,6 +422,7 @@ mainkanKartu(K):-
     cekDrawTwo(X1,Y1),
     cekWild(X1),
     cekDrawFour(X1),
+    (count(X2, 0) -> endGame(C); true),
     retract(top_card_sebelumnya(_,_)),
     assertz(top_card_sebelumnya(A,B)).
 
@@ -503,6 +506,107 @@ lihatCommand:-
     write('1. lihatCommand'), nl,
     write('2. lihatKartu'), nl,
     write('3. cekInfo'), nl.
+
+perhitunganpoint_extra([], _).
+perhitunganpoint_extra([A], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A1), write(' = '),
+    poin(Nama, X),
+    write(X), write(' poin'), nl.
+perhitunganpoint_extra([A], Nama):-
+    number(A),
+    write(A), write(' = '),
+    poin(Nama, X),
+    write(X), write(' poin').
+perhitunganpoint_extra([A|B], Nama):-
+    number(A),
+    write(A), write(' + '),
+    perhitunganpoint_extra(B, Nama).
+perhitunganpoint_extra([A|B], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A1), write(' + '),
+    perhitunganpoint_extra(B, Nama).
+
+perhitunganpoint([], [], Nama) :- 
+    write('kartu habis = 0 point'),
+    asserta(poin(Nama, 0)).
+perhitunganpoint([A],[B], Nama):-
+    number(A),
+    write(A),
+    write('-'),
+    write(B),
+    write(' = '),
+    poin(Nama, X),
+    X1 is X + A,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)).
+perhitunganpoint([A],[B], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A),
+    write('-'),
+    write(B),
+    write(' = '),
+    poin(Nama, X),
+    X1 is X + A1,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)).
+perhitunganpoint([H|T], [A|B], Nama):-
+    number(H),
+    write(H), write('-'), write(A), 
+    write(' + '),
+    poin(Nama, X),
+    X1 is X + H,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)),
+    perhitunganpoint(T, B, Nama).
+perhitunganpoint([H|T], [A|B], Nama):-
+    \+number(H),
+    (H == 'skip' -> A1 is 10; true),
+    (H == 'reverse' -> A1 is 10; true),
+    (H == 'drawtwo' -> A1 is 10; true),
+    (H == 'wilddrawfour' -> A1 is 20; true),
+    (H == 'wild' -> A1 is 20; true),
+    write(H), write('-'), write(A), 
+    write(' + '),
+    poin(Nama, X),
+    X1 is X + A1,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)),
+    perhitunganpoint(T, B, Nama).
+
+printpoint(0).
+printpoint(Id):-
+    Id > 0,
+    Id1 is Id - 1,
+    printpoint(Id1),
+    listpemain(Id, Nama, Kartu, Warna),
+    write(Nama), write(': '),
+    perhitunganpoint(Kartu, Warna, Nama),
+    perhitunganpoint_extra(Kartu, Nama), nl.
+
+endGame(X):-
+    jumlahPemain(N),
+    listpemain(X, N1, _, _),
+    write('Permainan selesai! '),
+    write(N1),
+    write(' menghabiskan semua kartunya!'),nl,nl,
+    write('Berikut perhitungan poin sisa kartu.'),nl,
+    printpoint(N).
 
 
 
