@@ -3,6 +3,7 @@
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
+:- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
 :- include('file1.pl').
 statusEfek(off).
 
@@ -197,16 +198,6 @@ tampilkanKartu([Kartu|TK], [Warna|TW], N) :-
     tampilkanKartu(TK, TW, N1).
 
 
-:- dynamic(top_card_sebelumnya/2).
-
-
-/*
-Notes:
-- assertz urutanSekarang(0,1) di startgame
-- teks mainkanKartu belum pasti benar (kurang contoh)
-- tantang belum diimplementasikan
-*/
-
 top_card_sebelumnya(a,b).
 cekList(X1, Y1, [X1|_], [Y1|_], 0):- !.
 cekList(_,_, [], [], -1):- !.
@@ -258,7 +249,6 @@ cekAngka(X1,Y1):-
     write('Giliran '), write(N2), nl.
 cekAngka(_,_).
 
-
 cekSkip(X1,Y1):-
     X1 == 'skip',
     write('Pemain berikutnya kehilangan giliran.'), nl, nl,
@@ -270,7 +260,6 @@ cekSkip(X1,Y1):-
     get_element(R2, 0, C2), listpemain(C2, N2, _, _),
     write('Giliran '), write(N2), nl.
 cekSkip(_,_).
-
 
 cekReverse(X1,Y1):-
     X1 == 'reverse',
@@ -284,7 +273,6 @@ cekReverse(X1,Y1):-
     get_element(R2, 0, C2), listpemain(C2, N2, _, _),
     write('Giliran '), write(N2), nl.
 cekReverse(_,_).
-
 
 cekWild(X1):-
     X1 == 'wild',
@@ -300,7 +288,6 @@ cekWild(X1):-
     write('Giliran '), write(N2), nl.
 cekWild(_).
 
-
 cekDrawTwo(X1,Y1):-
     X1 == 'drawtwo',
     retract(statusEfek(_)),
@@ -310,7 +297,6 @@ cekDrawTwo(X1,Y1):-
     assertz(top_card(X1,Y1)),
     ambilKartu.
 cekDrawTwo(_,_).
-
 
 cekDrawFour(X1):-
     X1 == 'wilddrawfour',
@@ -327,7 +313,6 @@ cekDrawFour(X1):-
     get_element(R2, 0, C2), listpemain(C2, N2, _, _),
     write('Giliran '), write(N2), nl.
 cekDrawFour(_).
-
 
 cekKartu(A, B, _, Y1):-
     number(A),
@@ -436,14 +421,12 @@ mainkanKartu(K):-
     cekDrawFour(X1),
     retract(top_card_sebelumnya(_,_)),
     assertz(top_card_sebelumnya(A,B)).
-    
 
 
 listkosong([],[],1).
 listkosong([_|_],[],0).
 listkosong([],[_|_],0).
 listkosong([_|_],[_|_],0).
-
 
 jumlahElemenList([],0).
 jumlahElemenList([_|T],Sum):-
