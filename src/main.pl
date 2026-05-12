@@ -513,8 +513,6 @@ cekTangkap(I,Count,N):-
     I1 is I+1,
     cekTangkap(I1,Count,N).
 
-start:-
-    cekTangkap(0,0,5).
 
 lihatCommand:-
     urutanGiliran(R1),
