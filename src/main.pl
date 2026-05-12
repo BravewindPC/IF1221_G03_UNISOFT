@@ -216,7 +216,7 @@ removeListIdx([H1|T1], [H2|T2], X, Y, Idx):-
 cekKartuValid(K):-
     urutanGiliran(R1),
     get_element(R1, 0, C), listpemain(C, _, X, _),
-    Count(X,Sum),
+    count(X,Sum),
     S is Sum+1,
     K<S,
     K>=1.
@@ -454,7 +454,7 @@ cekMain(_,_,X,Y,Out):-
     Out is 1.
 cekMain(A,B,X,Y,Out):-
     listkosong(X,Y,0),
-    Count(X,N),
+    count(X,N),
     cekSemuaKartu(A,B,X,Y,0,N),
     !,
     write('1. mainkanKartu'), nl,
@@ -471,25 +471,24 @@ cekTantang(A, Count, Out):-
 cekTantang(_,Count,Count).
 
 
-cekUni(X,Count, Out):-
-    Count(X,Sum),
+cekUni(X,C, Out):-
+    count(X,Sum),
     Sum =:= 2,
     !,
-    write(Count), write('. uni'), nl,
-    Out is Count+1.
-cekUni(_,Count,Count).
+    write(C), write('. uni'), nl,
+    Out is C+1.
+cekUni(_,C,C).
 
 
 cekTangkap(O2):-
-    \+statusEfek(on).
-    write(Count), write('. ambilKartu'), nl.
+    \+statusEfek(on),
+    write(O2), write('. tangkap'), nl.
 cekTangkap(_):-
     statusEfek(on).
 
 lihatCommand:-
     urutanGiliran(R1),
     top_card(A, B),
-    jumlahPemain(N),
     get_element(R1, 0, C), listpemain(C, _, X, Y),
     nl,
     write('Aksi utama yang tersedia:'), nl,
