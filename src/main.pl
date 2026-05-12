@@ -198,6 +198,13 @@ tampilkanKartu([Kartu|TK], [Warna|TW], N) :-
     tampilkanKartu(TK, TW, N1).
 
 
+top_card_sebelumnya(a,b).
+cekList(X1, Y1, [X1|_], [Y1|_], 0):- !.
+cekList(_,_, [], [], -1):- !.
+cekList(X1, Y1, [_|T1], [_|T2], Idx):-
+    I is Idx+1,
+    cekList(X1, Y1, T1, T2, I).
+
 insert_head(H, [], [H]).
 insert_head(H, T, [H|T]).
 
