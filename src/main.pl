@@ -216,7 +216,7 @@ removeListIdx([H1|T1], [H2|T2], X, Y, Idx):-
 cekKartuValid(K):-
     urutanGiliran(R1),
     get_element(R1, 0, C), listpemain(C, _, X, _),
-    jumlahElemenList(X,Sum),
+    Count(X,Sum),
     S is Sum+1,
     K<S,
     K>=1.
@@ -429,10 +429,6 @@ listkosong([_|_],[],0).
 listkosong([],[_|_],0).
 listkosong([_|_],[_|_],0).
 
-jumlahElemenList([],0).
-jumlahElemenList([_|T],Sum):-
-    jumlahElemenList(T,S1),
-    Sum is S1+1.
 
 ceksalah(1).
 cekSemuaKartu(_,_,_,_,N,N):- !, ceksalah(0).
@@ -458,7 +454,7 @@ cekMain(_,_,X,Y,Out):-
     Out is 1.
 cekMain(A,B,X,Y,Out):-
     listkosong(X,Y,0),
-    jumlahElemenList(X,N),
+    Count(X,N),
     cekSemuaKartu(A,B,X,Y,0,N),
     !,
     write('1. mainkanKartu'), nl,
@@ -476,7 +472,7 @@ cekTantang(_,Count,Count).
 
 
 cekUni(X,Count, Out):-
-    jumlahElemenList(X,Sum),
+    Count(X,Sum),
     Sum =:= 2,
     !,
     write(Count), write('. uni'), nl,
