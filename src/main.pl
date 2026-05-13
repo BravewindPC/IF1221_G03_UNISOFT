@@ -538,7 +538,7 @@ perhitunganpoint_extra([A|B], Nama):-
     perhitunganpoint_extra(B, Nama).
 
 perhitunganpoint([], [], Nama) :- 
-    write('kartu habis = 0 point'),
+    write('kartu habis = 0 poin'),
     asserta(poin(Nama, 0)).
 perhitunganpoint([A],[B], Nama):-
     number(A),
@@ -599,6 +599,44 @@ printpoint(Id):-
     perhitunganpoint(Kartu, Warna, Nama),
     perhitunganpoint_extra(Kartu, Nama), nl.
 
+mergesort([],[]).
+mergesort([A],[A]).
+mergesort([A,B|R],S):-   
+    split([A,B|R],L1,L2),   
+    mergesort(L1,S1),   
+    mergesort(L2,S2),   
+    merge(S1,S2,S).
+split([],[],[]).
+split([A],[A],[]).
+split([A,B|R],[A|Ra],[B|Rb]):-   
+    split(R,Ra,Rb).
+merge(A,[],A).
+merge([],B,B).
+merge([A|Ra],[B|Rb],[A|M]):-   
+    A =< B, 
+    merge(Ra,[B|Rb],M).
+merge([A|Ra],[B|Rb],[B|M]):-   
+    A > B, 
+    merge([A|Ra],Rb,M).
+
+point_list(X, [X1]):- X is 1, !, listpemain(X, N, _, _), poin(N, P), X1 is P.
+point_list(X, [A|B]):- 
+    X > 1,
+    listpemain(X, N, _, _),
+    poin(N,P),
+    A is P,
+    X1 is X - 1,
+    point_list(X1, B).
+
+cetakpemenang(_, []).
+cetakpemenang(X, [H|T]):-
+    write(X), write('. '),
+    poin(Nama, H),
+    write(Nama), write(' '),
+    write('('), write(H), write(' poin)'),nl,
+    X1 is X + 1,
+    cetakpemenang(X1, T).
+
 endGame(X):-
     jumlahPemain(N),
     listpemain(X, N1, _, _),
@@ -606,7 +644,15 @@ endGame(X):-
     write(N1),
     write(' menghabiskan semua kartunya!'),nl,nl,
     write('Berikut perhitungan poin sisa kartu.'),nl,
-    printpoint(N).
+    printpoint(N),
+    point_list(N, Pl),
+    mergesort(Pl,Plurut),nl,
+    write('Urutan pemenang:'),nl,
+    cetakpemenang(1,Plurut),nl,
+    get_element(Plurut,0,Poin),
+    poin(Pemenang,Poin),
+    write('Selamat, '), write(Pemenang), write(' menjadi pemenang!'),nl.
+
 
 
 
