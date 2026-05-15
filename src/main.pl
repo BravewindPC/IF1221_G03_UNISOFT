@@ -786,6 +786,38 @@ list_uni(N, R, C):-
         ; true
     ).
 
+    tangkap(_) :-
+    statusEfek(on),
+    write('Perintah tidak valid.'), nl, !.
+
+tangkap(NamaTarget) :-
+    \+listpemain(_, NamaTarget, _, _),
+    write('Pemain tidak ditemukan.'), nl, !.
+
+tangkap(NamaTarget) :-
+    urutanGiliran([IdSaya|_]),
+    listpemain(IdSaya, NamaTarget, _, _),
+    write('Tidak bisa menangkap diri sendiri.'), nl, !.
+
+tangkap(NamaTarget) :-
+    listpemain(IdTarget, NamaTarget, KartuTarget, _),
+    count(KartuTarget, JumlahKartu),
+    statusUni(IdTarget, StatusUni),
+    JumlahKartu =:= 1,
+    StatusUni == off,
+    !,
+    write(NamaTarget), write(' tertangkap tidak menyerukan UNI.'), nl,
+    write(NamaTarget), write(' mendapatkan 2 kartu penalti.'), nl,
+    ambilKartu(IdTarget, 2).
+
+tangkap(_) :-
+    urutanGiliran([IdSaya|_]),
+    listpemain(IdSaya, NamaSaya, _, _),
+    write('Tuduhan salah! '),
+    write(NamaSaya), write(' mendapat 1 kartu penalti.'), nl,
+    ambilKartu(IdSaya, 1).
+
+
 saveGame:-
     jumlahPemain(N),
     write('Masukkan nama file penyimpanan: '),
