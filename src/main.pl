@@ -14,6 +14,9 @@ setUni(Id)   :- retract(statusUni(Id, _)), assertz(statusUni(Id, on)).
 
 statusEfek(off).
 
+append_element([],E,[E]).
+append_element([Head|Tail], Element, [Head|NewTail]):- append_element(Tail, Element, NewTail).
+
 get_element([Element|_], 0, Element).
 get_element([_|Tail], Index, Element) :- Index > 0, NI is Index - 1, get_element(Tail, NI, Element).
 
@@ -149,8 +152,8 @@ ambilKartu(Id, JumlahKartu) :-
     ambilKartu(JumlahKartu, K_Baru, W_Baru),
     write(Nama), write(' mendapatkan '), write(JumlahKartu), write(' dengan rincian:'),
     printKartu(K_Baru, W_Baru), nl,
-    append(K_Lama, K_Baru, K_Total),
-    append(W_Lama, W_Baru, W_Total),
+    append_element(K_Lama, K_Baru, K_Total),
+    append_element(W_Lama, W_Baru, W_Total),
     retract(listpemain(Id, Nama, K_Lama, W_Lama)),
     assertz(listpemain(Id, Nama, K_Total, W_Total)),
     resetUni(Id),
@@ -173,7 +176,7 @@ matikan_status_efek.
 reverse_list([], []).
 reverse_list([H|T], R):-
     reverse_list(T, RT),
-    append(RT, [H], R).
+    append_element(RT, [H], R).
 
 ambilKartu(0, [], []) :- !.
 ambilKartu(N, [K|SisaK], [W|SisaW]) :-
@@ -192,7 +195,7 @@ printKoma([]).
 
 putarGiliran :-
     retract(urutanGiliran([H|T])),
-    append(T, [H], UrutanBaru),
+    append_element(T, [H], UrutanBaru),
     assertz(urutanGiliran(UrutanBaru)).
 
 lihatKartu :-
@@ -728,5 +731,86 @@ uni(K) :-
     retract(top_card_sebelumnya(_, _)),
     assertz(top_card_sebelumnya(A, B)).
 
+lowercase_atom(Atom, Lower) :-
+    name(Atom, Codes),
+    lower_codes(Codes, LowerCodes),
+    name(Lower, LowerCodes).
 
+lower_codes([], []).
+lower_codes([C|Cs], [LC|Ls]) :-
+    C >= 65,
+    C =< 90,
+    LC is C + 32,
+    lower_codes(Cs, Ls).
+lower_codes([C|Cs], [C|Ls]) :-
+    (C < 65 ; C > 90),
+    lower_codes(Cs, Ls).
 
+simpan_kartu([A],[B], Stream):-
+    write(Stream, B), write(Stream,'-'), write(Stream,A).
+simpan_kartu([A|C],[B|D], Stream):-
+    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,','),
+    simpan_kartu(C, D, Stream).
+
+simpan_pemain(0, _).
+simpan_pemain(N, Stream):-
+    N > 0,
+    N1 is N - 1,
+    simpan_pemain(N1, Stream),
+    listpemain(N, Nama, K, W),
+    lowercase_atom(Nama, Na),
+    write(Stream, 'kartu_'), write(Stream, Na), write(Stream,':['), 
+    simpan_kartu(K, W, Stream),
+    write(Stream,']'), nl(Stream).
+
+list_nama([A],[B]):-
+    listpemain(A,B1,_,_),
+    lowercase_atom(B1, B).
+list_nama([A|B], [C|D]):-
+    listpemain(A,C1,_,_),
+    lowercase_atom(C1, C),
+    list_nama(B, D).
+
+gabung([], L, L).
+gabung([H|T], L2, [H|L3]) :-
+    gabung(T, L2, L3).
+
+list_uni(0, R, R).
+list_uni(N, R, C):-
+    N1 is N - 1,
+    list_uni(N1, R, C),
+    (statusUni(N, on) -> 
+        listpemain(N,Nama,_,_),
+        lowercase_atom(Nama, Na),
+        append_element(R,Na,C)
+        ; true
+    ).
+
+saveGame:-
+    jumlahPemain(N),
+    write('Masukkan nama file penyimpanan: '),
+    read(Nama),
+    name(Nama, NamaList),          
+    gabung(NamaList, [46,116,120,116], FileList),
+    name(FileName, FileList),      
+    open(FileName, write, Stream),
+    write(Stream, 'urutan_pemain:'),
+    urutantetap(X, Y),
+    list_nama(X, Nama1),
+    write(Stream, Nama1), nl(Stream),
+    urutanGiliran([H|_]),
+    listpemain(H, Nama2,_,_),
+    lowercase_atom(Nama2, Na2),
+    write(Stream, 'giliran:'), write(Stream,Na2),  nl(Stream),
+    top_card(A, B),
+    write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),nl(Stream),
+    simpan_pemain(N, Stream),
+    write(Stream, 'arah_permainan:'), write(Stream, Y), nl(Stream),
+    write(Stream, 'warna_aktif:'), write(Stream,B), nl(Stream),
+    list_uni(N, [], C),
+    write(Stream,'status_UNI:'), write(Stream,C), nl(Stream),
+    close(Stream),
+    write('Status permainan berhasil disimpan ke '),
+    write(FileName),
+    write('.'),
+    nl.
