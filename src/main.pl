@@ -9,7 +9,8 @@
 :- include('file1.pl').
 :- dynamic(statusUni/2). /*(Id, on/off)*/
 
-resetUni(Id) :- retract(statusUni(Id, _)), assertz(statusUni(Id, off)).
+resetUni(Id) :- retract(statusUni(Id, _)), assertz(statusUni(Id, off)), !.
+resetUni(_).
 setUni(Id)   :- retract(statusUni(Id, _)), assertz(statusUni(Id, on)).
 
 statusEfek(off).
@@ -176,7 +177,7 @@ matikan_status_efek.
 reverse_list([], []).
 reverse_list([H|T], R):-
     reverse_list(T, RT),
-    append_element(RT, [H], R).
+    append_element(RT, H, R).
 
 ambilKartu(0, [], []) :- !.
 ambilKartu(N, [K|SisaK], [W|SisaW]) :-
@@ -195,7 +196,7 @@ printKoma([]).
 
 putarGiliran :-
     retract(urutanGiliran([H|T])),
-    append_element(T, [H], UrutanBaru),
+    append_element(T, H, UrutanBaru),
     assertz(urutanGiliran(UrutanBaru)).
 
 lihatKartu :-
