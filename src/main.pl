@@ -153,8 +153,8 @@ ambilKartu(Id, JumlahKartu) :-
     ambilKartu(JumlahKartu, K_Baru, W_Baru),
     write(Nama), write(' mendapatkan '), write(JumlahKartu), write(' dengan rincian:'),
     printKartu(K_Baru, W_Baru), nl,
-    append_element(K_Lama, K_Baru, K_Total),
-    append_element(W_Lama, W_Baru, W_Total),
+    gabung(K_Lama, K_Baru, K_Total),
+    gabung(W_Lama, W_Baru, W_Total),
     retract(listpemain(Id, Nama, K_Lama, W_Lama)),
     assertz(listpemain(Id, Nama, K_Total, W_Total)),
     resetUni(Id),
@@ -778,14 +778,16 @@ gabung([H|T], L2, [H|L3]) :-
 
 list_uni(0, R, R).
 list_uni(N, R, C):-
-    N1 is N - 1,
-    list_uni(N1, R, C),
-    (statusUni(N, on) -> 
-        listpemain(N,Nama,_,_),
+    N > 0,
+    ( statusUni(N, on) ->
+        listpemain(N, Nama, _, _),
         lowercase_atom(Nama, Na),
-        append_element(R,Na,C)
-        ; true
-    ).
+        append_element(R, Na, R1)
+    ;
+        R1 = R
+    ),
+    N1 is N - 1,
+    list_uni(N1, R1, C).
 
     tangkap(_) :-
     statusEfek(on),
