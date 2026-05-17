@@ -732,25 +732,10 @@ uni(K) :-
     retract(top_card_sebelumnya(_, _)),
     assertz(top_card_sebelumnya(A, B)).
 
-lowercase_atom(Atom, Lower) :-
-    name(Atom, Codes),
-    lower_codes(Codes, LowerCodes),
-    name(Lower, LowerCodes).
-
-lower_codes([], []).
-lower_codes([C|Cs], [LC|Ls]) :-
-    C >= 65,
-    C =< 90,
-    LC is C + 32,
-    lower_codes(Cs, Ls).
-lower_codes([C|Cs], [C|Ls]) :-
-    (C < 65 ; C > 90),
-    lower_codes(Cs, Ls).
-
 simpan_kartu([A],[B], Stream):-
     write(Stream, B), write(Stream,'-'), write(Stream,A).
 simpan_kartu([A|C],[B|D], Stream):-
-    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,','),
+    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,'.'),
     simpan_kartu(C, D, Stream).
 
 simpan_pemain(0, _).
@@ -759,37 +744,36 @@ simpan_pemain(N, Stream):-
     N1 is N - 1,
     simpan_pemain(N1, Stream),
     listpemain(N, Nama, K, W),
-    lowercase_atom(Nama, Na),
-    write(Stream, 'kartu_'), write(Stream, Na), write(Stream,':['), 
+    write(Stream, 'kartu('), write(Stream,'\''), write(Stream, Nama), write(Stream,'\''), write(Stream,'):['), 
     simpan_kartu(K, W, Stream),
-    write(Stream,']'), nl(Stream).
+    write(Stream,']'), write(Stream,'.'), nl(Stream).
 
-list_nama([A],[B]):-
-    listpemain(A,B1,_,_),
-    lowercase_atom(B1, B).
-list_nama([A|B], [C|D]):-
-    listpemain(A,C1,_,_),
-    lowercase_atom(C1, C),
-    list_nama(B, D).
+list_nama([A],Stream):-
+    listpemain(A,B,_,_),
+    write(Stream,'\''), write(Stream, B), write(Stream,'\'').
+list_nama([A|B],Stream):-
+    listpemain(A,C,_,_),
+    write(Stream, '\''), write(Stream, C), write(Stream,'\','),
+    list_nama(B, Stream).
 
 gabung([], L, L).
 gabung([H|T], L2, [H|L3]) :-
     gabung(T, L2, L3).
 
-list_uni(0, R, R).
-list_uni(N, R, C):-
+list_uni(0, _, _).
+list_uni(N, K, Stream):-
     N > 0,
     ( statusUni(N, on) ->
+        ( N \== K -> write(Stream,',');true),
         listpemain(N, Nama, _, _),
-        lowercase_atom(Nama, Na),
-        append_element(R, Na, R1)
+        write(Stream, '\''), write(Stream, Nama), write(Stream, '\'')
     ;
-        R1 = R
+        true
     ),
     N1 is N - 1,
-    list_uni(N1, R1, C).
+    list_uni(N1, K, Stream).
 
-    tangkap(_) :-
+tangkap(_) :-
     statusEfek(on),
     write('Perintah tidak valid.'), nl, !.
 
@@ -829,21 +813,21 @@ saveGame:-
     gabung(NamaList, [46,116,120,116], FileList),
     name(FileName, FileList),      
     open(FileName, write, Stream),
-    write(Stream, 'urutan_pemain:'),
+    write(Stream, 'urutan_pemain:['),
     urutantetap(X, Y),
-    list_nama(X, Nama1),
-    write(Stream, Nama1), nl(Stream),
+    list_nama(X, Stream),
+    write(Stream,'].'),nl(Stream),
     urutanGiliran([H|_]),
     listpemain(H, Nama2,_,_),
-    lowercase_atom(Nama2, Na2),
-    write(Stream, 'giliran:'), write(Stream,Na2),  nl(Stream),
+    write(Stream, 'giliran:'), write(Stream,'\''), write(Stream,Nama2),  write(Stream,'\''), write(Stream,'.'),nl(Stream),
     top_card(A, B),
-    write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),nl(Stream),
+    write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
+    write(Stream, 'warna_aktif:'), write(Stream,B), write(Stream,'.'),nl(Stream),
+    write(Stream, 'arah_permainan:'), write(Stream, Y),write(Stream,'.'), nl(Stream),
+    write(Stream,'status_UNI:['),
+    list_uni(N, N, Stream),
+    write(Stream,'].'),nl(Stream),
     simpan_pemain(N, Stream),
-    write(Stream, 'arah_permainan:'), write(Stream, Y), nl(Stream),
-    write(Stream, 'warna_aktif:'), write(Stream,B), nl(Stream),
-    list_uni(N, [], C),
-    write(Stream,'status_UNI:'), write(Stream,C), nl(Stream),
     close(Stream),
     write('Status permainan berhasil disimpan ke '),
     write(FileName),
