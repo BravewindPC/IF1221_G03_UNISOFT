@@ -3,6 +3,13 @@
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
+<<<<<<< Updated upstream
+=======
+:- dynamic(statusTantang/1).
+:- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
+:- dynamic(urutantetap/2).
+:- dynamic(debug/1).
+>>>>>>> Stashed changes
 :- include('file1.pl').
 statusEfek(off).
 
@@ -71,6 +78,8 @@ startGame :-
     X1 is XValid - 1,
     input_pemain(X1, XValid),
     assertz(jumlahPemain(XValid)),
+    assertz(top_card_sebelumnya(a,b)),
+    assertz(statusTantang(0)),
     buat_list(XValid, XValid, R), 
     permutation(R, R1), !, 
     assertz(urutanGiliran(R1)), 
@@ -111,6 +120,7 @@ cekInfo :-
 ambilKartu:-
     /*liat kartu paling atas, kalo +2, ambil 2 kartu. perlu akses urutan turn dan tumpukan paling atas*/
     statusEfek(on),
+    statusEfek(0),
     urutanGiliran([X|_]),
     listpemain(X, _, _, _),
     top_card(Kartu, _),
@@ -120,11 +130,29 @@ ambilKartu:-
 ambilKartu:-
     /*jika +4 maka ambil 4 kartu*/
     statusEfek(on),
+    statusEfek(0),
     urutanGiliran([X|_]),
     listpemain(X, _, _, _),
     top_card(Kartu, _),
     Kartu = wilddrawfour, !,
     ambilKartu(X, 4).
+
+ambilKartu:-
+    statusEfek(on),
+    statusTantang(1),
+    !,
+    urutanGiliran([X|_]),
+    listpemain(X, _, _, _),
+    ambilKartu(X, 6).
+
+ambilKartu:-
+    statusEfek(on),
+    statusTantang(2),
+    !,
+    urutanGiliran([X|_]),
+    listpemain(X, _, _, _),
+    ambilKartu(X, 4).
+
 
 ambilKartu:- 
     /*jika bukan +2/+4 maka ambil 1 kartu*/
@@ -144,12 +172,14 @@ ambilKartu(Id, JumlahKartu) :-
     assertz(listpemain(Id, Nama, K_Total, W_Total)),
     matikan_status_efek,
     putarGiliran, 
+    \+statusTantang(2),
     urutanGiliran(UrutanBaru),
     write('Urutan pemain: '),
     printurutan(UrutanBaru), nl,
     UrutanBaru = [NextId|_],
     listpemain(NextId, NamaNext, _, _),
     write('Giliran '), write(NamaNext), write('.'), nl.
+ambilKartu(_,_):- !.
 
 matikan_status_efek :- 
     statusEfek(on), 
@@ -197,6 +227,7 @@ tampilkanKartu([Kartu|TK], [Warna|TW], N) :-
     tampilkanKartu(TK, TW, N1).
 
 
+<<<<<<< Updated upstream
 :- dynamic(top_card_sebelumnya/2).
 
 
@@ -213,6 +244,8 @@ cekList(_,_, [], [], -1):- !.
 cekList(X1, Y1, [_|T1], [_|T2], Idx):-
     I is Idx+1,
     cekList(X1, Y1, T1, T2, I).
+=======
+>>>>>>> Stashed changes
 
 insert_head(H, [], [H]).
 insert_head(H, T, [H|T]).
@@ -385,6 +418,7 @@ cekKartu(A, _, X1, _):-
     !.
 
 cekKartu(A, _, X1, _):-
+    \+statusEfek(on),
     X1 == 'wilddrawfour',
     A \== 'wilddrawfour',
     !.
@@ -533,5 +567,69 @@ lihatCommand:-
     write('2. lihatKartu'), nl,
     write('3. cekInfo'), nl.
 
+ambilTail([],[]).
+ambilTail([H],[H]).
+ambilTail([_|T], Tail):-
+    ambilTail(T,Tail).
+
+removeTail([],[]).
+removeTail([_],[]).
+removeTail([H|T],[H|O1]):-
+    removeTail(T,O1).
+    
+reversePutarGiliran:-
+    urutanGiliran(R1),
+    ambilTail(R1,Tail),
+    removeTail(R1, R2),
+    append(Tail,R2,R3),
+    retract(urutanGiliran(_)),
+    assertz(urutanGiliran(R3)).
 
 
+tantangan(A1,B1,X,Y,N):-
+    \+cekSemuaKartu(A1,B1,X,Y,0,N),
+    write('Tantangan gagal. '), nl,
+    retract(statusTantang(_)),
+    assertz(statusTantang(1)),
+    ambilKartu,
+    retract(statusTantang(_)),
+    assertz(statusTantang(0)).
+tantangan(A1,B1,X,Y,N):-
+    cekSemuaKartu(A1,B1,X,Y,0,N),
+    write('Tantangan berhasil. '), nl,
+    retract(statusTantang(_)),
+    assertz(statusTantang(2)),
+    reversePutarGiliran,
+    ambilKartu,
+    putarGiliran,
+    retract(statusTantang(_)),
+    assertz(statusTantang(0)),
+    urutanGiliran(R1),
+    get_element(R1, 0, C), listpemain(C, N1, _, _),
+    write('Giliran '), write(N1).
+
+
+tantang:-
+    statusEfek(off),
+    write('Tantang tidak bisa dilakukan.').
+tantang:-
+    statusEfek(on),
+    top_card(A, _),
+    A \== 'wilddrawfour',
+    write('Tantang tidak bisa dilakukan.').
+tantang:-
+    statusEfek(on),
+    top_card(A, _),
+    A == 'wilddrawfour',
+    write('cek1'),
+    urutanGiliran(R1),
+    top_card_sebelumnya(A1,B1),
+    jumlahPemain(N),
+    N1 is N-1,
+    get_element(R1, N1, C), listpemain(C, N2, X, Y),
+    write('Tantangan dilakukan!'),
+    nl,
+    nl,
+    write('Memeriksa kartu '), write(N2), nl,
+    count(X,N3),
+    tantangan(A1,B1,X,Y,N3).
