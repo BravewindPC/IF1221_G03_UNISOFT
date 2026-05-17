@@ -7,6 +7,7 @@
 :- dynamic(urutantetap/2).
 :- dynamic(poin/2).
 :- include('file1.pl').
+:- include('file2.pl').
 :- dynamic(statusUni/2). /*(Id, on/off)*/
 
 resetUni(Id) :- retract(statusUni(Id, _)), assertz(statusUni(Id, off)), !.
@@ -833,3 +834,4 @@ saveGame:-
     write(FileName),
     write('.'),
     nl.
+    
