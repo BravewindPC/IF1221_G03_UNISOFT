@@ -735,7 +735,7 @@ uni(K) :-
 simpan_kartu([A],[B], Stream):-
     write(Stream, B), write(Stream,'-'), write(Stream,A).
 simpan_kartu([A|C],[B|D], Stream):-
-    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,'.'),
+    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,','),
     simpan_kartu(C, D, Stream).
 
 simpan_pemain(0, _).
