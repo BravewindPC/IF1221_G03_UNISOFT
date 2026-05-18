@@ -16,6 +16,17 @@ setUni(Id)   :- retract(statusUni(Id, _)), assertz(statusUni(Id, on)).
 
 statusEfek(off).
 
+numberCek(0).
+numberCek(1).
+numberCek(2).
+numberCek(3).
+numberCek(4).
+numberCek(5).
+numberCek(6).
+numberCek(7).
+numberCek(8).
+numberCek(9).
+
 append_element([],E,[E]).
 append_element([Head|Tail], Element, [Head|NewTail]):- append_element(Tail, Element, NewTail).
 
@@ -271,7 +282,7 @@ pilihWarna(Y, Y):-
     validasiwarna(Y).
     
 cekAngka(X1,Y1):-
-    number(X1),
+    numberCek(X1),
     X1>=0,
     X1<10,
     putarGiliran,
@@ -352,14 +363,14 @@ cekDrawFour(X1):-
 cekDrawFour(_).
 
 cekKartu(A, B, _, Y1):-
-    number(A),
+    numberCek(A),
     A>=0,
     A<10,
     B == Y1,
     !.
 cekKartu(A, _, X1, _):-
-    number(A),
-    number(X1),
+    numberCek(A),
+    numberCek(X1),
     A>=0,
     A<10,
     A =:= X1,
@@ -556,7 +567,7 @@ reversePutarGiliran:-
     urutanGiliran(R1),
     ambilTail(R1,Tail),
     removeTail(R1, R2),
-    append(Tail,R2,R3),
+    append_element(Tail,R2,R3),
     retract(urutanGiliran(_)),
     assertz(urutanGiliran(R3)).
 
@@ -584,7 +595,7 @@ tantangan(A1,B1,X,Y,N):-
     write('Giliran '), write(N1).
 perhitunganpoint_extra([], _).
 perhitunganpoint_extra([A], Nama):-
-    \+number(A),
+    \+numberCek(A),
     (A == 'skip' -> A1 is 10; true),
     (A == 'reverse' -> A1 is 10; true),
     (A == 'drawtwo' -> A1 is 10; true),
@@ -594,16 +605,16 @@ perhitunganpoint_extra([A], Nama):-
     poin(Nama, X),
     write(X), write(' poin'), nl.
 perhitunganpoint_extra([A], Nama):-
-    number(A),
+    numberCek(A),
     write(A), write(' = '),
     poin(Nama, X),
     write(X), write(' poin').
 perhitunganpoint_extra([A|B], Nama):-
-    number(A),
+    numberCek(A),
     write(A), write(' + '),
     perhitunganpoint_extra(B, Nama).
 perhitunganpoint_extra([A|B], Nama):-
-    \+number(A),
+    \+numberCek(A),
     (A == 'skip' -> A1 is 10; true),
     (A == 'reverse' -> A1 is 10; true),
     (A == 'drawtwo' -> A1 is 10; true),
@@ -616,7 +627,7 @@ perhitunganpoint([], [], Nama) :-
     write('kartu habis = 0 poin'),
     asserta(poin(Nama, 0)).
 perhitunganpoint([A],[B], Nama):-
-    number(A),
+    numberCek(A),
     write(A),
     write('-'),
     write(B),
@@ -626,7 +637,7 @@ perhitunganpoint([A],[B], Nama):-
     retract(poin(Nama,_)),
     asserta(poin(Nama,X1)).
 perhitunganpoint([A],[B], Nama):-
-    \+number(A),
+    \+numberCek(A),
     (A == 'skip' -> A1 is 10; true),
     (A == 'reverse' -> A1 is 10; true),
     (A == 'drawtwo' -> A1 is 10; true),
@@ -641,7 +652,7 @@ perhitunganpoint([A],[B], Nama):-
     retract(poin(Nama,_)),
     asserta(poin(Nama,X1)).
 perhitunganpoint([H|T], [A|B], Nama):-
-    number(H),
+    numberCek(H),
     write(H), write('-'), write(A), 
     write(' + '),
     poin(Nama, X),
@@ -650,7 +661,7 @@ perhitunganpoint([H|T], [A|B], Nama):-
     asserta(poin(Nama,X1)),
     perhitunganpoint(T, B, Nama).
 perhitunganpoint([H|T], [A|B], Nama):-
-    \+number(H),
+    \+numberCek(H),
     (H == 'skip' -> A1 is 10; true),
     (H == 'reverse' -> A1 is 10; true),
     (H == 'drawtwo' -> A1 is 10; true),
