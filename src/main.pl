@@ -6,8 +6,21 @@
 :- dynamic(statusTantang/1).
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
 :- dynamic(urutantetap/2).
+:- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
+:- dynamic(urutantetap/2).
+:- dynamic(poin/2).
 :- include('file1.pl').
+:- include('file2.pl').
+:- dynamic(statusUni/2). /*(Id, on/off)*/
+
+resetUni(Id) :- retract(statusUni(Id, _)), assertz(statusUni(Id, off)), !.
+resetUni(_).
+setUni(Id)   :- retract(statusUni(Id, _)), assertz(statusUni(Id, on)).
+
 statusEfek(off).
+
+append_element([],E,[E]).
+append_element([Head|Tail], Element, [Head|NewTail]):- append_element(Tail, Element, NewTail).
 
 get_element([Element|_], 0, Element).
 get_element([_|Tail], Index, Element) :- Index > 0, NI is Index - 1, get_element(Tail, NI, Element).
@@ -36,7 +49,9 @@ input_pemain(X, Y) :-
     write(': '),
     read(Z),
     cek_nama(Z, Z1),
+    asserta(poin(Z1, 0)),
     assertz(listpemain(Y1, Z1, [], [])),
+    assertz(statusUni(Y1, off)),
     X1 is X - 1,
     input_pemain(X1, Y).
 
@@ -79,6 +94,7 @@ startGame :-
     buat_list(XValid, XValid, R), 
     permutation(R, R1), !, 
     assertz(urutanGiliran(R1)), 
+    assertz(urutantetap(R1,'kanan')),
     write('Urutan pemain: '), 
     printurutan(R1),
     start_kartu(XValid),
@@ -162,10 +178,11 @@ ambilKartu(Id, JumlahKartu) :-
     ambilKartu(JumlahKartu, K_Baru, W_Baru),
     write(Nama), write(' mendapatkan '), write(JumlahKartu), write(' dengan rincian:'),
     printKartu(K_Baru, W_Baru), nl,
-    append(K_Lama, K_Baru, K_Total),
-    append(W_Lama, W_Baru, W_Total),
+    gabung(K_Lama, K_Baru, K_Total),
+    gabung(W_Lama, W_Baru, W_Total),
     retract(listpemain(Id, Nama, K_Lama, W_Lama)),
     assertz(listpemain(Id, Nama, K_Total, W_Total)),
+    resetUni(Id),
     matikan_status_efek,
     putarGiliran, 
     \+statusTantang(2),
@@ -187,7 +204,7 @@ matikan_status_efek.
 reverse_list([], []).
 reverse_list([H|T], R):-
     reverse_list(T, RT),
-    append(RT, [H], R).
+    append_element(RT, H, R).
 
 ambilKartu(0, [], []) :- !.
 ambilKartu(N, [K|SisaK], [W|SisaW]) :-
@@ -206,7 +223,7 @@ printKoma([]).
 
 putarGiliran :-
     retract(urutanGiliran([H|T])),
-    append(T, [H], UrutanBaru),
+    append_element(T, H, UrutanBaru),
     assertz(urutanGiliran(UrutanBaru)).
 
 lihatKartu :-
@@ -238,7 +255,7 @@ removeListIdx([H1|T1], [H2|T2], X, Y, Idx):-
 cekKartuValid(K):-
     urutanGiliran(R1),
     get_element(R1, 0, C), listpemain(C, _, X, _),
-    jumlahElemenList(X,Sum),
+    count(X,Sum),
     S is Sum+1,
     K<S,
     K>=1.
@@ -247,12 +264,12 @@ validasiwarna('merah').
 validasiwarna('biru').
 validasiwarna('kuning').
 validasiwarna('hijau').
-pilihWarna(Y, _):-
+pilihWarna(Y, Z):-
     \+validasiwarna(Y),
     nl,
     write('Warna tidak valid, input lagi:'),
     read(Y1),
-    pilihWarna(Y1, _).
+    pilihWarna(Y1, Z).
 pilihWarna(Y, Y):-
     validasiwarna(Y).
     
@@ -268,7 +285,6 @@ cekAngka(X1,Y1):-
     write('Giliran '), write(N2), nl.
 cekAngka(_,_).
 
-
 cekSkip(X1,Y1):-
     X1 == 'skip',
     write('Pemain berikutnya kehilangan giliran.'), nl, nl,
@@ -281,9 +297,12 @@ cekSkip(X1,Y1):-
     write('Giliran '), write(N2), nl.
 cekSkip(_,_).
 
-
 cekReverse(X1,Y1):-
     X1 == 'reverse',
+    urutantetap(R1,Arah),
+    (Arah = 'kanan' -> Arah1 = 'kiri'; Arah1 = 'kanan'),
+    retract(urutantetap(_,_)),
+    asserta(urutantetap(R1,Arah1)),
     urutanGiliran([H|T]),
     reverse_list([H|T],R),
     retract(urutanGiliran(_)),
@@ -294,7 +313,6 @@ cekReverse(X1,Y1):-
     get_element(R2, 0, C2), listpemain(C2, N2, _, _),
     write('Giliran '), write(N2), nl.
 cekReverse(_,_).
-
 
 cekWild(X1):-
     X1 == 'wild',
@@ -310,7 +328,6 @@ cekWild(X1):-
     write('Giliran '), write(N2), nl.
 cekWild(_).
 
-
 cekDrawTwo(X1,Y1):-
     X1 == 'drawtwo',
     retract(statusEfek(_)),
@@ -320,7 +337,6 @@ cekDrawTwo(X1,Y1):-
     assertz(top_card(X1,Y1)),
     ambilKartu.
 cekDrawTwo(_,_).
-
 
 cekDrawFour(X1):-
     X1 == 'wilddrawfour',
@@ -337,7 +353,6 @@ cekDrawFour(X1):-
     get_element(R2, 0, C2), listpemain(C2, N2, _, _),
     write('Giliran '), write(N2), nl.
 cekDrawFour(_).
-
 
 cekKartu(A, B, _, Y1):-
     number(A),
@@ -445,9 +460,9 @@ mainkanKartu(K):-
     cekDrawTwo(X1,Y1),
     cekWild(X1),
     cekDrawFour(X1),
+    (count(X2, 0) -> endGame(C); true),
     retract(top_card_sebelumnya(_,_)),
     assertz(top_card_sebelumnya(A,B)).
-    
 
 
 listkosong([],[],1).
@@ -456,13 +471,8 @@ listkosong([],[_|_],0).
 listkosong([_|_],[_|_],0).
 
 
-jumlahElemenList([],0).
-jumlahElemenList([_|T],Sum):-
-    jumlahElemenList(T,S1),
-    Sum is S1+1.
-
 ceksalah(1).
-cekSemuaKartu(_,_,_,_,N,N): -!, ceksalah(0).
+cekSemuaKartu(_,_,_,_,N,N):- !, ceksalah(0).
 cekSemuaKartu(A,B,X,Y,Count,N):-
     get_element(X,Count,X1),
     get_element(Y,Count,Y1),
@@ -485,7 +495,7 @@ cekMain(_,_,X,Y,Out):-
     Out is 1.
 cekMain(A,B,X,Y,Out):-
     listkosong(X,Y,0),
-    jumlahElemenList(X,N),
+    count(X,N),
     cekSemuaKartu(A,B,X,Y,0,N),
     !,
     write('1. mainkanKartu'), nl,
@@ -502,33 +512,24 @@ cekTantang(A, Count, Out):-
 cekTantang(_,Count,Count).
 
 
-cekUni(X,Count, Out):-
-    jumlahElemenList(X,Sum),
+cekUni(X,C, Out):-
+    count(X,Sum),
     Sum =:= 2,
     !,
-    write(Count), write('. uni'), nl,
-    Out is Count+1.
-cekUni(_,Count,Count).
+    write(C), write('. uni'), nl,
+    Out is C+1.
+cekUni(_,C,C).
 
 
-ceksatu(1).
-cekTangkap(N,_,N):- !.
-cekTangkap(I,Count,_):-
-    urutanGiliran(R1),
-    get_element(R1, I, C), listpemain(C, _, X, _),
-    jumlahElemenList(X, Sum),
-    ceksatu(Sum),
-    !,
-    write(Count), write('. tangkap'), nl.
-cekTangkap(I,Count,N):-
-    I1 is I+1,
-    cekTangkap(I1,Count,N).
-
+cekTangkap(O2):-
+    \+statusEfek(on),
+    write(O2), write('. tangkap'), nl.
+cekTangkap(_):-
+    statusEfek(on).
 
 lihatCommand:-
     urutanGiliran(R1),
     top_card(A, B),
-    jumlahPemain(N),
     get_element(R1, 0, C), listpemain(C, _, X, Y),
     nl,
     write('Aksi utama yang tersedia:'), nl,
@@ -537,7 +538,7 @@ lihatCommand:-
     C1 is Count+1,
     cekTantang(A, C1, O1),
     cekUni(X,O1,O2),
-    cekTangkap(1,O2,N),
+    cekTangkap(O2),
     nl,
     write('Aksi pendukung yang tersedia:'), nl,
     write('1. lihatCommand'), nl,
@@ -584,7 +585,164 @@ tantangan(A1,B1,X,Y,N):-
     urutanGiliran(R1),
     get_element(R1, 0, C), listpemain(C, N1, _, _),
     write('Giliran '), write(N1).
+perhitunganpoint_extra([], _).
+perhitunganpoint_extra([A], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A1), write(' = '),
+    poin(Nama, X),
+    write(X), write(' poin'), nl.
+perhitunganpoint_extra([A], Nama):-
+    number(A),
+    write(A), write(' = '),
+    poin(Nama, X),
+    write(X), write(' poin').
+perhitunganpoint_extra([A|B], Nama):-
+    number(A),
+    write(A), write(' + '),
+    perhitunganpoint_extra(B, Nama).
+perhitunganpoint_extra([A|B], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A1), write(' + '),
+    perhitunganpoint_extra(B, Nama).
 
+perhitunganpoint([], [], Nama) :- 
+    write('kartu habis = 0 poin'),
+    asserta(poin(Nama, 0)).
+perhitunganpoint([A],[B], Nama):-
+    number(A),
+    write(A),
+    write('-'),
+    write(B),
+    write(' = '),
+    poin(Nama, X),
+    X1 is X + A,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)).
+perhitunganpoint([A],[B], Nama):-
+    \+number(A),
+    (A == 'skip' -> A1 is 10; true),
+    (A == 'reverse' -> A1 is 10; true),
+    (A == 'drawtwo' -> A1 is 10; true),
+    (A == 'wilddrawfour' -> A1 is 20; true),
+    (A == 'wild' -> A1 is 20; true),
+    write(A),
+    write('-'),
+    write(B),
+    write(' = '),
+    poin(Nama, X),
+    X1 is X + A1,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)).
+perhitunganpoint([H|T], [A|B], Nama):-
+    number(H),
+    write(H), write('-'), write(A), 
+    write(' + '),
+    poin(Nama, X),
+    X1 is X + H,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)),
+    perhitunganpoint(T, B, Nama).
+perhitunganpoint([H|T], [A|B], Nama):-
+    \+number(H),
+    (H == 'skip' -> A1 is 10; true),
+    (H == 'reverse' -> A1 is 10; true),
+    (H == 'drawtwo' -> A1 is 10; true),
+    (H == 'wilddrawfour' -> A1 is 20; true),
+    (H == 'wild' -> A1 is 20; true),
+    write(H), write('-'), write(A), 
+    write(' + '),
+    poin(Nama, X),
+    X1 is X + A1,
+    retract(poin(Nama,_)),
+    asserta(poin(Nama,X1)),
+    perhitunganpoint(T, B, Nama).
+
+printpoint(0).
+printpoint(Id):-
+    Id > 0,
+    Id1 is Id - 1,
+    printpoint(Id1),
+    listpemain(Id, Nama, Kartu, Warna),
+    write(Nama), write(': '),
+    perhitunganpoint(Kartu, Warna, Nama),
+    perhitunganpoint_extra(Kartu, Nama), nl.
+
+mergesort([],[]).
+mergesort([A],[A]).
+mergesort([A,B|R],S):-   
+    split([A,B|R],L1,L2),   
+    mergesort(L1,S1),   
+    mergesort(L2,S2),   
+    merge(S1,S2,S).
+split([],[],[]).
+split([A],[A],[]).
+split([A,B|R],[A|Ra],[B|Rb]):-   
+    split(R,Ra,Rb).
+merge(A,[],A).
+merge([],B,B).
+merge([A|Ra],[B|Rb],[A|M]):-   
+    A =< B, 
+    merge(Ra,[B|Rb],M).
+merge([A|Ra],[B|Rb],[B|M]):-   
+    A > B, 
+    merge([A|Ra],Rb,M).
+
+point_list(X, [X1]):- X is 1, !, listpemain(X, N, _, _), poin(N, P), X1 is P.
+point_list(X, [A|B]):- 
+    X > 1,
+    listpemain(X, N, _, _),
+    poin(N,P),
+    A is P,
+    X1 is X - 1,
+    point_list(X1, B).
+
+cetakpemenang(_, []).
+cetakpemenang(X, [H|T]):-
+    write(X), write('. '),
+    poin(Nama, H),
+    write(Nama), write(' '),
+    write('('), write(H), write(' poin)'),nl,
+    X1 is X + 1,
+    cetakpemenang(X1, T).
+
+endGame(X):-
+    jumlahPemain(N),
+    listpemain(X, N1, _, _),
+    write('Permainan selesai! '),
+    write(N1),
+    write(' menghabiskan semua kartunya!'),nl,nl,
+    write('Berikut perhitungan poin sisa kartu.'),nl,
+    printpoint(N),
+    point_list(N, Pl),
+    mergesort(Pl,Plurut),nl,
+    write('Urutan pemenang:'),nl,
+    cetakpemenang(1,Plurut),nl,
+    get_element(Plurut,0,Poin),
+    poin(Pemenang,Poin),
+    write('Selamat, '), write(Pemenang), write(' menjadi pemenang!'),nl.
+
+
+uni(_):- 
+    statusEfek(on),
+    write('Perintah tidak valid.'),
+    !, 
+    nl.
+
+uni(K) :-
+    \+cekKartuValid(K),
+    write('Kartu tidak valid!'),
+    !,
+    nl.
 
 tantang:-
     statusEfek(off),
@@ -610,3 +768,160 @@ tantang:-
     write('Memeriksa kartu '), write(N2), nl,
     count(X,N3),
     tantangan(A1,B1,X,Y,N3).
+uni(K) :-
+    urutanGiliran(R1),
+    top_card(A, B),
+    get_element(R1, 0, C),
+    listpemain(C, _, X, Y),
+    cekKartuValid(K),
+    Idx is K-1,
+    get_element(X, Idx, X1),
+    get_element(Y, Idx, Y1),
+    \+cekKartu(A, B, X1, Y1),
+    !,
+    write('Kartu tidak valid!'),
+    nl.
+
+/*jumlah kartu =/= 2*/
+
+uni(K) :-
+    urutanGiliran(R1),
+    get_element(R1, 0, C),
+    listpemain(C, N, X, _),
+    count(X, Sum),
+    Sum =\= 2,
+    cekKartuValid(K),
+    !,
+    write('Perintah UNI tidak valid!'), nl,
+    write(N), write(' mendapat penalti 1 kartu.'), nl,
+    ambilKartu(C, 1).
+
+uni(K) :-
+    urutanGiliran(R1),
+    top_card(A, B),
+    get_element(R1, 0, C),
+    listpemain(C, N, X, Y),
+    Idx is K-1,
+    get_element(X, Idx, X1),
+    get_element(Y, Idx, Y1),
+    cekKartu(A, B, X1, Y1),
+    nl,
+    write(N), write(' memainkan kartu: '),
+    write(Y1), write('-'), write(X1),
+    nl,
+    write(N), write(' menyerukan UNI!'), nl, nl,
+    removeListIdx(X, Y, X2, Y2, Idx),
+    retract(listpemain(C, N, _, _)),
+    assertz(listpemain(C, N, X2, Y2)),
+    setUni(C),
+    cekAngka(X1, Y1),
+    cekSkip(X1, Y1),
+    cekReverse(X1, Y1),
+    cekDrawTwo(X1, Y1),
+    cekWild(X1),
+    cekDrawFour(X1),
+    retract(top_card_sebelumnya(_, _)),
+    assertz(top_card_sebelumnya(A, B)).
+
+simpan_kartu([A],[B], Stream):-
+    write(Stream, B), write(Stream,'-'), write(Stream,A).
+simpan_kartu([A|C],[B|D], Stream):-
+    write(Stream, B), write(Stream,'-'), write(Stream,A), write(Stream,','),
+    simpan_kartu(C, D, Stream).
+
+simpan_pemain(0, _).
+simpan_pemain(N, Stream):-
+    N > 0,
+    N1 is N - 1,
+    simpan_pemain(N1, Stream),
+    listpemain(N, Nama, K, W),
+    write(Stream, 'kartu('), write(Stream,'\''), write(Stream, Nama), write(Stream,'\''), write(Stream,'):['), 
+    simpan_kartu(K, W, Stream),
+    write(Stream,']'), write(Stream,'.'), nl(Stream).
+
+list_nama([A],Stream):-
+    listpemain(A,B,_,_),
+    write(Stream,'\''), write(Stream, B), write(Stream,'\'').
+list_nama([A|B],Stream):-
+    listpemain(A,C,_,_),
+    write(Stream, '\''), write(Stream, C), write(Stream,'\','),
+    list_nama(B, Stream).
+
+gabung([], L, L).
+gabung([H|T], L2, [H|L3]) :-
+    gabung(T, L2, L3).
+
+list_uni(0, _, _).
+list_uni(N, K, Stream):-
+    N > 0,
+    ( statusUni(N, on) ->
+        ( N \== K -> write(Stream,',');true),
+        listpemain(N, Nama, _, _),
+        write(Stream, '\''), write(Stream, Nama), write(Stream, '\'')
+    ;
+        true
+    ),
+    N1 is N - 1,
+    list_uni(N1, K, Stream).
+
+tangkap(_) :-
+    statusEfek(on),
+    write('Perintah tidak valid.'), nl, !.
+
+tangkap(NamaTarget) :-
+    \+listpemain(_, NamaTarget, _, _),
+    write('Pemain tidak ditemukan.'), nl, !.
+
+tangkap(NamaTarget) :-
+    urutanGiliran([IdSaya|_]),
+    listpemain(IdSaya, NamaTarget, _, _),
+    write('Tidak bisa menangkap diri sendiri.'), nl, !.
+
+tangkap(NamaTarget) :-
+    listpemain(IdTarget, NamaTarget, KartuTarget, _),
+    count(KartuTarget, JumlahKartu),
+    statusUni(IdTarget, StatusUni),
+    JumlahKartu =:= 1,
+    StatusUni == off,
+    !,
+    write(NamaTarget), write(' tertangkap tidak menyerukan UNI.'), nl,
+    write(NamaTarget), write(' mendapatkan 2 kartu penalti.'), nl,
+    ambilKartu(IdTarget, 2).
+
+tangkap(_) :-
+    urutanGiliran([IdSaya|_]),
+    listpemain(IdSaya, NamaSaya, _, _),
+    write('Tuduhan salah! '),
+    write(NamaSaya), write(' mendapat 1 kartu penalti.'), nl,
+    ambilKartu(IdSaya, 1).
+
+
+saveGame:-
+    jumlahPemain(N),
+    write('Masukkan nama file penyimpanan: '),
+    read(Nama),
+    name(Nama, NamaList),          
+    gabung(NamaList, [46,116,120,116], FileList),
+    name(FileName, FileList),      
+    open(FileName, write, Stream),
+    write(Stream, 'urutan_pemain:['),
+    urutantetap(X, Y),
+    list_nama(X, Stream),
+    write(Stream,'].'),nl(Stream),
+    urutanGiliran([H|_]),
+    listpemain(H, Nama2,_,_),
+    write(Stream, 'giliran:'), write(Stream,'\''), write(Stream,Nama2),  write(Stream,'\''), write(Stream,'.'),nl(Stream),
+    top_card(A, B),
+    write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
+    write(Stream, 'warna_aktif:'), write(Stream,B), write(Stream,'.'),nl(Stream),
+    write(Stream, 'arah_permainan:'), write(Stream, Y),write(Stream,'.'), nl(Stream),
+    write(Stream,'status_UNI:['),
+    list_uni(N, N, Stream),
+    write(Stream,'].'),nl(Stream),
+    simpan_pemain(N, Stream),
+    close(Stream),
+    write('Status permainan berhasil disimpan ke '),
+    write(FileName),
+    write('.'),
+    nl.
+    
