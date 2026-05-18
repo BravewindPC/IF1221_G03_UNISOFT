@@ -3,13 +3,10 @@
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
-:- dynamic(statusTantang/1).
-:- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
+:- dynamic(statusTantang/1). /* 0: tidak melakukan tantang, 1: tantang gagal, 2: tantang berhasil
 :- dynamic(urutantetap/2).
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
-:- dynamic(urutantetap/2).
 :- dynamic(poin/2).
-:- include('file1.pl').
 :- include('file2.pl').
 :- dynamic(statusUni/2). /*(Id, on/off)*/
 
