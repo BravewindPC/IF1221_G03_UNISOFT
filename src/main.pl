@@ -3,13 +3,9 @@
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
-<<<<<<< Updated upstream
-=======
 :- dynamic(statusTantang/1).
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
 :- dynamic(urutantetap/2).
-:- dynamic(debug/1).
->>>>>>> Stashed changes
 :- include('file1.pl').
 statusEfek(off).
 
@@ -227,25 +223,6 @@ tampilkanKartu([Kartu|TK], [Warna|TW], N) :-
     tampilkanKartu(TK, TW, N1).
 
 
-<<<<<<< Updated upstream
-:- dynamic(top_card_sebelumnya/2).
-
-
-/*
-Notes:
-- assertz urutanSekarang(0,1) di startgame
-- teks mainkanKartu belum pasti benar (kurang contoh)
-- tantang belum diimplementasikan
-*/
-
-top_card_sebelumnya(a,b).
-cekList(X1, Y1, [X1|_], [Y1|_], 0):- !.
-cekList(_,_, [], [], -1):- !.
-cekList(X1, Y1, [_|T1], [_|T2], Idx):-
-    I is Idx+1,
-    cekList(X1, Y1, T1, T2, I).
-=======
->>>>>>> Stashed changes
 
 insert_head(H, [], [H]).
 insert_head(H, T, [H|T]).
