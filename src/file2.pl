@@ -5,7 +5,7 @@ loadGame:-
     gabung(NamaList, [46,116,120,116], FileList),
     name(FileName, FileList),
     baca_file(FileName).
-    
+
 baca_file(Link):-
     open(Link,read,Stream),
     read(Stream, urutan_pemain:X),
@@ -26,7 +26,8 @@ baca_file(Link):-
     retractall(urutanGiliran(_)),
     (Arah == 'kiri' -> reverse_list(R, Rbalik), asserta(urutanGiliran(Rbalik)); asserta(urutanGiliran(R))),
     
-    get_index(X, Index, Y),
+    reverse_list(X, RR),
+    get_index(RR, Index, Y),
     Idx is Index + 1,
     
     atururutan(Idx),
@@ -56,12 +57,12 @@ tidak_ada(X, [H|T]) :-
 
 atururutan(Y):-
     urutanGiliran([H|_]),
-    H == Y, !.
-atururutan(Y):-
-    urutanGiliran([H|_]),
     H \== Y,
+    write('cek1'), nl,
+    write(H), write(Y), nl,
     putarGiliran,
     atururutan(Y).
+atururutan(_).
     
 get_index([Element|_], 0, Element).
 get_index([_|Tail], Index, Element):-
