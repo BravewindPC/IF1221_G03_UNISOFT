@@ -142,7 +142,7 @@ cekInfo :-
 ambilKartu:-
     /*liat kartu paling atas, kalo +2, ambil 2 kartu. perlu akses urutan turn dan tumpukan paling atas*/
     statusEfek(on),
-    statusEfek(0),
+    statusTantang(0),
     urutanGiliran([X|_]),
     listpemain(X, _, _, _),
     top_card(Kartu, _),
@@ -152,7 +152,7 @@ ambilKartu:-
 ambilKartu:-
     /*jika +4 maka ambil 4 kartu*/
     statusEfek(on),
-    statusEfek(0),
+    statusTantang(0),
     urutanGiliran([X|_]),
     listpemain(X, _, _, _),
     top_card(Kartu, _),
