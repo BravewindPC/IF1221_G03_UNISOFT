@@ -84,12 +84,12 @@ start_kartu(XValid):-
 printurutan([T]) :- 
     listpemain(T, Nama, _, _), 
     write(Nama), 
-    write('.'), nl.
+    write('.'), nl, !.
 printurutan([H|T]):- 
     listpemain(H, Nama, _, _),
     write(Nama),
     write(' - '),
-    printurutan(T).
+    printurutan(T), !.
 
 startGame :- 
     write('Masukan jumlah pemain: '), 
@@ -923,6 +923,8 @@ saveGame:-
     write(Stream, 'giliran:'), write(Stream,'\''), write(Stream,Nama2),  write(Stream,'\''), write(Stream,'.'),nl(Stream),
     top_card(A, B),
     write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
+    ((A == wild ; A == wilddrawfour) -> C = hitam; C = B),
+    write(Stream,'discard_top:'), write(Stream,C), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
     write(Stream, 'warna_aktif:'), write(Stream,B), write(Stream,'.'),nl(Stream),
     write(Stream, 'arah_permainan:'), write(Stream, Y),write(Stream,'.'), nl(Stream),
     write(Stream,'status_UNI:['),

@@ -10,8 +10,8 @@ baca_file(Link):-
     open(Link,read,Stream),
     read(Stream, urutan_pemain:X),
     read(Stream, giliran:Y),
-    read(Stream, discard_top:B-A),
-    read(Stream, _Z),
+    read(Stream, discard_top:_Z-A),
+    read(Stream, warna_aktif:B),
     read(Stream, arah_permainan:Arah),
     read(Stream, status_UNI:ListUni),
 
@@ -33,13 +33,13 @@ baca_file(Link):-
     atururutan(Idx),
     retractall(top_card(_,_)),
     retractall(top_card_sebelumnya(_,_)),
-
+    asserta(top_card_sebelumnya(dummy, dummy)),
     asserta(top_card(A, B)),
-    retractall(statusUNI(_,_)),
-    retractall(listpemain(_)),
+    retractall(statusUni(_,_)),
+    retractall(listpemain(_,_,_,_)),
 
     retractall(statusEfek(_)),
-    asserta(statusEfek(0)),
+    asserta(statusEfek(off)),
 
     retractall(statusTantang(_)),
     asserta(statusTantang(0)),
@@ -53,7 +53,7 @@ baca_file(Link):-
 setupUni(_, []).
 setupUni(L, [H|T]):-
     listpemain(Id, H, _, _),
-    (tidak_ada(H, L) -> asserta(statusUNI(Id, off)); asserta(statusUNI(Id, on))),
+    (tidak_ada(H, L) -> asserta(statusUni(Id, off)); asserta(statusUni(Id, on))),
     setupUni(L, T).
 
 tidak_ada(_, []).
@@ -64,8 +64,6 @@ tidak_ada(X, [H|T]) :-
 atururutan(Y):-
     urutanGiliran([H|_]),
     H \== Y,
-    write('cek1'), nl,
-    write(H), write(Y), nl,
     putarGiliran,
     atururutan(Y).
 atururutan(_).
