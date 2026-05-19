@@ -36,8 +36,14 @@ baca_file(Link):-
 
     asserta(top_card(A, B)),
     retractall(statusUNI(_,_)),
-
     retractall(listpemain(_)),
+
+    retractall(statusEfek(_)),
+    asserta(statusEfek(0)),
+
+    retractall(statusTantang(_)),
+    asserta(statusTantang(0)),
+
     baca_kartu(N, Stream),
     setupUni(ListUni, X),
     close(Stream),
