@@ -922,7 +922,6 @@ saveGame:-
     listpemain(H, Nama2,_,_),
     write(Stream, 'giliran:'), write(Stream,'\''), write(Stream,Nama2),  write(Stream,'\''), write(Stream,'.'),nl(Stream),
     top_card(A, B),
-    write(Stream,'discard_top:'), write(Stream,B), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
     ((A == wild ; A == wilddrawfour) -> C = hitam; C = B),
     write(Stream,'discard_top:'), write(Stream,C), write(Stream,'-'),write(Stream,A),write(Stream,'.'),nl(Stream),
     write(Stream, 'warna_aktif:'), write(Stream,B), write(Stream,'.'),nl(Stream),
