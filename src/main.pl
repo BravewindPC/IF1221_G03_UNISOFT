@@ -945,3 +945,68 @@ saveGame:-
     write('.'),
     nl.
     
+semuaSatuKartu(0).
+semuaSatuKartu(N) :-
+    N > 0,
+    listpemain(N, _, Kartu, _),
+    count(Kartu, 1),
+    N1 is N - 1,
+    semuaSatuKartu(N1).
+
+pilihIdAcak(N, Id) :-
+    N1 is N + 1,
+    random(1, N1, Id).
+
+pilihPemainAcakDenganKartu(N, Id) :-
+    pilihIdAcak(N, Id),
+    listpemain(Id, _, Kartu, _),
+    count(Kartu, J),
+    J > 1, !.
+pilihPemainAcakDenganKartu(N, Id) :-
+    pilihPemainAcakDenganKartu(N, Id).
+
+pilihPemainAcakSelain(N, IdKecuali, Id) :-
+    pilihIdAcak(N, Id),
+    Id =\= IdKecuali, !.
+pilihPemainAcakSelain(N, IdKecuali, Id) :-
+    pilihPemainAcakSelain(N, IdKecuali, Id).
+
+pindahKartu(IdAsal, IdTujuan, Idx) :-
+    listpemain(IdAsal,   NamaAsal,   KAsal,   WAsal),
+    listpemain(IdTujuan, NamaTujuan, KTujuan, WTujuan),
+    get_element(KAsal, Idx, Kartu),
+    get_element(WAsal, Idx, Warna),
+    removeListIdx(KAsal, WAsal, KAsalBaru, WAsalBaru, Idx),
+    retract(listpemain(IdAsal, NamaAsal, _, _)),
+    assertz(listpemain(IdAsal, NamaAsal, KAsalBaru, WAsalBaru)),
+    append_element(KTujuan, Kartu, KTujuanBaru),
+    append_element(WTujuan, Warna, WTujuanBaru),
+    retract(listpemain(IdTujuan, NamaTujuan, _, _)),
+    assertz(listpemain(IdTujuan, NamaTujuan, KTujuanBaru, WTujuanBaru)),
+    write('Kartu '), write(Warna), write('-'), write(Kartu),
+    write(' milik '), write(NamaAsal),
+    write(' berpindah ke tangan '), write(NamaTujuan), write('!'), nl.
+godsHand :-
+    jumlahPemain(N),
+    semuaSatuKartu(N), !,
+    write('Semua pemain hanya memiliki 1 kartu, WOWOK tidak mau ikut campur.'), nl.
+godsHand :-
+    random(0, 100, Roll),
+    Roll >= 20, !,
+    write('Hmmm.. mungkin kamu adalah ANTEK ASING sehingga WOWOK tidak berkehendak untuk membantumu.'), nl.
+godsHand :-
+    jumlahPemain(N),
+    write('WOWOK telah berkehendak.'), nl,
+    pilihPemainAcakDenganKartu(N, IdAsal),
+    listpemain(IdAsal, _, KAsal, _),
+    count(KAsal, JmlKartu),
+    random(0, JmlKartu, IdxKartu),
+    pilihPemainAcakSelain(N, IdAsal, IdTujuan),
+    pindahKartu(IdAsal, IdTujuan, IdxKartu),
+    putarGiliran,
+    urutanGiliran([NextId|_]),
+    listpemain(NextId, NamaNext, _, _),
+    write('Giliran '), write(NamaNext), write('.'), nl.
+
+
+wowoksHand :- write('yu no boll'), nl, godsHand.
