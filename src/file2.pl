@@ -14,7 +14,6 @@ baca_file(Link):-
     read(Stream, warna_aktif:B),
     read(Stream, arah_permainan:Arah),
     read(Stream, status_UNI:ListUni),
-
     retractall(jumlahPemain(_)),
     count(X, N),
     asserta(jumlahPemain(N)),
@@ -37,13 +36,11 @@ baca_file(Link):-
     asserta(top_card(A, B)),
     retractall(statusUni(_,_)),
     retractall(listpemain(_,_,_,_)),
-
     retractall(statusEfek(_)),
     asserta(statusEfek(off)),
-
     retractall(statusTantang(_)),
     asserta(statusTantang(0)),
-
+    retractall(poin(_,_)),
     baca_kartu(N, Stream),
     setupUni(ListUni, X),
     close(Stream),
@@ -84,6 +81,7 @@ baca_kartu(N, Stream):-
     baca_kartu(N1, Stream),
     read(Stream, kartu(Nama):K),
     pisah(K, TN, TW),
+    asserta(poin(Nama, 0)),
     asserta(listpemain(N, Nama, TN, TW)).
     
 

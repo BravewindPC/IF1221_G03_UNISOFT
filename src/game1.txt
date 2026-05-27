@@ -1,0 +1,8 @@
+urutan_pemain:['b','a'].
+giliran:'b'.
+discard_top:kuning-6.
+warna_aktif:kuning.
+arah_permainan:kanan.
+status_UNI:['a'].
+kartu('a'):[hitam-wilddrawfour].
+kartu('b'):[biru-2,biru-4,biru-2,merah-3,merah-1,merah-1,hijau-6,biru-drawtwo,kuning-3,merah-4,biru-0,hijau-7,merah-6].

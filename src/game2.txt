@@ -1,0 +1,9 @@
+urutan_pemain:['Faishal','Kevin','Bayu'].
+giliran:'Faishal'.
+discard_top:kuning-3.
+warna_aktif:kuning.
+arah_permainan:kanan.
+status_UNI:['Kevin'].
+kartu('Bayu'):[biru-skip,kuning-3,merah-4,biru-0].
+kartu('Kevin'):[hitam-wilddrawfour].
+kartu('Faishal'):[biru-2,hijau-0,hitam-wild,biru-0].

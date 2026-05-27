@@ -470,9 +470,10 @@ mainkanKartu(K):-
     cekDrawTwo(X1,Y1),
     cekWild(X1),
     cekDrawFour(X1),
-    (count(X2, 0) -> endGame(C); true),
-    retract(top_card_sebelumnya(_,_)),
-    assertz(top_card_sebelumnya(A,B)).
+    (count(X2, 0) -> endGame(C); 
+        retract(top_card_sebelumnya(_,_)),
+        assertz(top_card_sebelumnya(A,B))
+    ).
 
 
 listkosong([],[],1).
@@ -587,12 +588,14 @@ perhitunganpoint_extra([A], Nama):-
     write(X), write(' poin'), nl.
 perhitunganpoint_extra([A], Nama):-
     numberCek(A),
-    write(A), write(' = '),
+    (A is 0 -> write(1); write(A)),
+    write(' = '),
     poin(Nama, X),
     write(X), write(' poin').
 perhitunganpoint_extra([A|B], Nama):-
     numberCek(A),
-    write(A), write(' + '),
+    (A is 0 -> write(1); write(A)),
+    write(' + '),
     perhitunganpoint_extra(B, Nama).
 perhitunganpoint_extra([A|B], Nama):-
     \+numberCek(A),
@@ -614,7 +617,7 @@ perhitunganpoint([A],[B], Nama):-
     write(B),
     write(' = '),
     poin(Nama, X),
-    X1 is X + A,
+    (A is 0 -> X1 is X + 1; X1 is X + A),
     retract(poin(Nama,_)),
     asserta(poin(Nama,X1)).
 perhitunganpoint([A],[B], Nama):-
@@ -637,7 +640,7 @@ perhitunganpoint([H|T], [A|B], Nama):-
     write(H), write('-'), write(A), 
     write(' + '),
     poin(Nama, X),
-    X1 is X + H,
+    (H is 0 -> X1 is X + 1; X1 is X + H),
     retract(poin(Nama,_)),
     asserta(poin(Nama,X1)),
     perhitunganpoint(T, B, Nama).
@@ -861,18 +864,21 @@ gabung([], L, L).
 gabung([H|T], L2, [H|L3]) :-
     gabung(T, L2, L3).
 
-list_uni(0, _, _).
+list_uni(_, 0, _).
 list_uni(N, K, Stream):-
-    N > 0,
-    ( statusUni(N, on) ->
-        ( N \== K -> write(Stream,',');true),
-        listpemain(N, Nama, _, _),
-        write(Stream, '\''), write(Stream, Nama), write(Stream, '\'')
-    ;
-        true
+    (
+        statusUni(K, on) ->
+            (
+                N =:= 1 -> write(Stream, ',') ; true
+            ),
+            listpemain(K, Nama, _, _),
+            write(Stream, '\''), write(Stream, Nama), write(Stream, '\''),
+            N1 is 1
+        ;
+            N1 is N
     ),
-    N1 is N - 1,
-    list_uni(N1, K, Stream).
+    K1 is K - 1,
+    list_uni(N1, K1, Stream).
 
 tangkap(_) :-
     statusEfek(on),
@@ -907,6 +913,9 @@ tangkap(_) :-
 
 
 saveGame:-
+    statusEfek(on), !,
+    write('Perintah ini tidak dapat dilakukan').
+saveGame:-
     jumlahPemain(N),
     write('Masukkan nama file penyimpanan: '),
     read(Nama),
@@ -927,7 +936,7 @@ saveGame:-
     write(Stream, 'warna_aktif:'), write(Stream,B), write(Stream,'.'),nl(Stream),
     write(Stream, 'arah_permainan:'), write(Stream, Y),write(Stream,'.'), nl(Stream),
     write(Stream,'status_UNI:['),
-    list_uni(N, N, Stream),
+    list_uni(0, N, Stream),
     write(Stream,'].'),nl(Stream),
     simpan_pemain(N, Stream),
     close(Stream),
