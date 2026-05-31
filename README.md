@@ -10,15 +10,15 @@ Cara menjalankan: Untuk menjalankan pertama kali, klik main.pl dan ketik startGa
 Repository ini memiliki struktur sebagai berikut:
 
 IF1221_G03_UNISOFT
-    -docs
-        = LAPORAN_G03.pdf
-        - Milestone1_G03.pdf
-        - Milestone2_G03.pdf
-    -src
-        - file1.pl
-        - file2.pl
-        - main.pl
-    - README.md
+ - docs
+   - LAPORAN_G03.pdf
+   - Milestone1_G03.pdf
+   - Milestone2_G03.pdf
+ - src
+   - file1.pl
+   - file2.pl
+   - main.pl
+ - README.md
 
 Penjelasan:
 - Folder docs mengandung laporan dari milestone 1 hingga 3
