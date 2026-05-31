@@ -1,4 +1,11 @@
 loadGame:-
+    \+statusPermainan(off), !,
+    (statusPermainan(end) ->
+        write('Permainan telah berakhir. Tidak dapat memuat permainan.')
+    ;
+        write('Permainan sedang berjalan. Tidak dapat memuat permainan.')
+    ), nl.
+loadGame:-
     write('Masukkan nama file yang akan dimuat: '),
     read(Nama),
     name(Nama, NamaList),          
@@ -45,7 +52,9 @@ baca_file(Link):-
     setupUni(ListUni, X),
     close(Stream),
     write('Status permainan berhasil dimuat dari '), write(Link), write('.'), nl,
-    write('Melanjutkan giliran '), write(Y), write('.').
+    write('Melanjutkan giliran '), write(Y), write('.'), 
+    retract(statusPermainan(_)),
+    asserta(statusPermainan(play)).
 
 setupUni(_, []).
 setupUni(L, [H|T]):-
