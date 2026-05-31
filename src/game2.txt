@@ -1,9 +1,0 @@
-urutan_pemain:['Pandu','Kevin','Bayu'].
-giliran:'Pandu'.
-discard_top:kuning-3.
-warna_aktif:kuning.
-arah_permainan:kanan.
-status_UNI:[].
-kartu('Bayu'):[biru-skip].
-kartu('Kevin'):[hitam-wilddrawfour,merah-skip].
-kartu('Pandu'):[biru-2,hitam-wild].
