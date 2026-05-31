@@ -6,6 +6,28 @@ Unisoft merupakan simulasi permainan kartu UNI yang mirip dengan permainan UNO. 
 # Cara menjalankan:
 Cara menjalankan: Untuk menjalankan pertama kali, klik main.pl dan ketik startGame untuk memulai permainan. Jika sebelumnya anda telah saveGame pada permainan selanjutnya, bisa menekan ulang main.pl dan ketik loadGame untuk melanjutkan permainan
 
+# Struktur Repository:
+Repository ini memiliki struktur sebagai berikut:
+
+IF1221_G03_UNISOFT
+    -docs
+        = LAPORAN_G03.pdf
+        - Milestone1_G03.pdf
+        - Milestone2_G03.pdf
+    -src
+        - file1.pl
+        - file2.pl
+        - main.pl
+    - README.md
+
+Penjelasan:
+- Folder docs mengandung laporan dari milestone 1 hingga 3
+- Folder src mengandung file prolog:
+    - file1.pl, berisi fakta dan predikat terkait jenis kartu dan pengambilan kartu
+    - file2.pl, berisi fakta dan predikit yang digunakan untuk perintah loadGame
+    - main.pl, berisi kumpulan fakta dan predikat untuk implementasi keseluruhan perintah Uni kecuali loadGame
+- README.md yang berisi penjelasan mengenai proyek, repository, fitur utama program, dan anggota kelompok
+
 # Fitur utama: 
 1. Startgame
 2. mainkanKartu
