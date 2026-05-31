@@ -24,7 +24,7 @@ Penjelasan:
 - Folder docs mengandung laporan dari milestone 1 hingga 3
 - Folder src mengandung file prolog:
     - file1.pl, berisi fakta dan predikat terkait jenis kartu dan pengambilan kartu
-    - file2.pl, berisi fakta dan predikit yang digunakan untuk perintah loadGame
+    - file2.pl, berisi fakta dan predikat yang digunakan untuk perintah loadGame
     - main.pl, berisi kumpulan fakta dan predikat untuk implementasi keseluruhan perintah Uni kecuali loadGame
 - README.md yang berisi penjelasan mengenai proyek, repository, fitur utama program, dan anggota kelompok
 
