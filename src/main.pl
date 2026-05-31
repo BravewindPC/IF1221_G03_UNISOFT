@@ -3,19 +3,22 @@
 :- dynamic(urutanGiliran/1). /* listID hasil urutan */ 
 :- dynamic(top_card/2). /* Menandakan kartu apa yang paling atas */
 :- dynamic(statusEfek/1). /* on/off untuk efek kartu +2/+4 */
-:- dynamic(statusTantang/1). /* 0: tidak melakukan tantang, 1: tantang gagal, 2: tantang berhasil
+:- dynamic(statusTantang/1). /* 0: tidak melakukan tantang, 1: tantang gagal, 2: tantang berhasil*/
 :- dynamic(urutantetap/2).
 :- dynamic(top_card_sebelumnya/2). /* Digunakan ketika implementasi tantang */
 :- dynamic(poin/2).
 :- include('file1.pl').
 :- include('file2.pl').
 :- dynamic(statusUni/2). /*(Id, on/off)*/
+:- dynamic(statusPermainan/1). /*off, play, end*/
 
 resetUni(Id) :- retract(statusUni(Id, _)), assertz(statusUni(Id, off)), !.
 resetUni(_).
 setUni(Id)   :- retract(statusUni(Id, _)), assertz(statusUni(Id, on)).
 
 statusEfek(off).
+statusPermainan(off).
+
 
 numberCek(0).
 numberCek(1).
@@ -92,6 +95,9 @@ printurutan([H|T]):-
     printurutan(T), !.
 
 startGame :- 
+    \+statusPermainan(off), !,
+    (statusPermainan(play) -> write('Permainan sedang berlangsung'); write('Permainan sudah selesai')), nl.
+startGame :-
     write('Masukan jumlah pemain: '), 
     read(X), 
     cek_pemain(X, XValid),
@@ -113,7 +119,9 @@ startGame :-
     assertz(top_card(A, B)),
     /*print */
     write('Kartu discard top: '), write(B), write('-'), write(A), nl,
-    write('Giliran '), get_element(R1, 0, C), listpemain(C, N, _, _), write(N), write('.'),nl.
+    write('Giliran '), get_element(R1, 0, C), listpemain(C, N, _, _), write(N), write('.'),nl,
+    retract(statusPermainan(_)),
+    assertz(statusPermainan(play)).
 
 count([],0).
 count([_|T], X) :- count(T, X1), X is X1 + 1.
@@ -129,7 +137,12 @@ cetakpemain(X):-
     count(Z, N),
     write('Jumlah kartu : '), write(N), nl, nl.
 
-cekInfo :-
+
+cekInfo:-
+    statusPermainan(end), !,
+    write('Permainan telah berakhir, tidak bisa melakukan aksi'),
+    nl.
+cekInfo:-
     top_card(X, Y), !,
     write('Kartu discard top: '),
     write(X), write('-'), write(Y), write(.),nl,nl,
@@ -138,6 +151,10 @@ cekInfo :-
     printurutan(Z), nl, nl,
     jumlahPemain(P),
     cetakpemain(P).
+
+ambilKartu:-
+    statusPermainan(end),
+    write('Permainan sudah selesai, tidak bisa melakukan aksi.'), nl.
 
 ambilKartu:-
     /*liat kartu paling atas, kalo +2, ambil 2 kartu. perlu akses urutan turn dan tumpukan paling atas*/
@@ -236,6 +253,10 @@ putarGiliran :-
     append_element(T, H, UrutanBaru),
     assertz(urutanGiliran(UrutanBaru)).
 
+lihatKartu:-
+    statusPermainan(end), !,
+    write('Permainan sudah selesai, tidak bisa melakukan aksi.'),
+    nl.
 lihatKartu :-
     urutanGiliran([IdPemain|_]),
     listpemain(IdPemain, _, ListKartu, ListWarna),
@@ -425,7 +446,11 @@ cekKartu(A, _, X1, _):-
     A \== 'wilddrawfour',
     !.
 
-
+mainkanKartu(_):-
+    statusPermainan(end),
+    write('Permainan sudah selesai, tidak bisa melakukan aksi'),
+    !,
+    nl.
 mainkanKartu(_):-
     statusEfek(on),
     write('Perintah tidak valid.'),
@@ -539,6 +564,9 @@ cekTangkap(_):-
     statusEfek(on).
 
 lihatCommand:-
+    statusPermainan(end), !,
+    write('Permainan telah berakhir. Tidak dapat melakukan aksi.'), nl.
+lihatCommand:-
     urutanGiliran(R1),
     top_card(A, B),
     get_element(R1, 0, C), listpemain(C, _, X, Y),
@@ -550,6 +578,8 @@ lihatCommand:-
     cekTantang(A, C1, O1),
     cekUni(X,O1,O2),
     cekTangkap(O2),
+    (statusEfek(off)-> O3 is O2 +1; O3 = O2),
+    cekGodshand(O3),
     nl,
     write('Aksi pendukung yang tersedia:'), nl,
     write('1. lihatCommand'), nl,
@@ -721,9 +751,14 @@ endGame(X):-
     cetakpemenang(1,Plurut),nl,
     get_element(Plurut,0,Poin),
     poin(Pemenang,Poin),
-    write('Selamat, '), write(Pemenang), write(' menjadi pemenang!'),nl.
+    write('Selamat, '), write(Pemenang), write(' menjadi pemenang!'),nl,
+    retract(statusPermainan(_)),
+    assertz(statusPermainan(end)),
+    write('Permainan selesai.').
 
-
+uni(_):-
+    statusPermainan(end), !,
+    write('Permainan telah berakhir. Tidak dapat melakukan aksi.'), nl.
 uni(_):- 
     statusEfek(on),
     write('Perintah tidak valid.'),
@@ -812,6 +847,10 @@ tantangan(A1,B1,X,Y,N):-
     urutanGiliran(R1),
     get_element(R1, 0, C), listpemain(C, N1, _, _),
     write('Giliran '), write(N1).
+
+tantang:-
+    statusPermainan(end), !,
+    write('Permainan sudah selesai, tidak bisa melakukan aksi.').
 tantang:-
     statusEfek(off),
     write('Tantang tidak bisa dilakukan.').
@@ -880,6 +919,9 @@ list_uni(N, K, Stream):-
     K1 is K - 1,
     list_uni(N1, K1, Stream).
 
+tangkap(_):-
+    statusPermainan(end), !,
+    write('Permainan sudah selesai, tidak bisa melakukan aksi.').
 tangkap(_) :-
     statusEfek(on),
     write('Perintah tidak valid.'), nl, !.
@@ -911,9 +953,11 @@ tangkap(_) :-
     write(NamaSaya), write(' mendapat 1 kartu penalti.'), nl,
     ambilKartu(IdSaya, 1).
 
-
 saveGame:-
-    statusEfek(on), !,
+    statusPermainan(end), !,
+    write('Permainan sudah selesai, tidak bisa disimpan.'), nl.
+saveGame:-
+    statusEfek(on), !,  
     write('Perintah ini tidak dapat dilakukan').
 saveGame:-
     jumlahPemain(N),
@@ -943,7 +987,9 @@ saveGame:-
     write('Status permainan berhasil disimpan ke '),
     write(FileName),
     write('.'),
-    nl.
+    nl, retract(statusPermainan(_)),
+    assertz(statusPermainan(end)),
+    write('Permainan selesai.'), nl.
     
 semuaSatuKartu(0).
 semuaSatuKartu(N) :-
@@ -986,6 +1032,10 @@ pindahKartu(IdAsal, IdTujuan, Idx) :-
     write('Kartu '), write(Warna), write('-'), write(Kartu),
     write(' milik '), write(NamaAsal),
     write(' berpindah ke tangan '), write(NamaTujuan), write('!'), nl.
+
+godsHand:-
+    statusPermainan(end), !,
+    write('Permainan sudah selesai, tidak bisa melakukan aksi.').
 godsHand :-
     jumlahPemain(N),
     semuaSatuKartu(N), !,
@@ -1010,3 +1060,9 @@ godsHand :-
 
 
 wowoksHand :- write('yu no boll'), nl, godsHand.
+
+cekGodshand(O3) :-
+    \+statusEfek(on),
+    write(O3), write('. godshand'), nl.
+cekGodshand(_):-
+    statusEfek(on).
