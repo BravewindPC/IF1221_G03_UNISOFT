@@ -20,10 +20,7 @@ Fitur utama:
 
 Anggota Kelompok:
 
-Bayu Palamarta Wirawan - 13525085 
-
-Muhammad Fauzi Muharam - 13525091 
-
-Muhammad Pandu Pulunggana - 13525059 
-
-Kevin Lincoln Hutabarat - 13525101
+1. Bayu Palamarta Wirawan - 13525085 
+2. Muhammad Fauzi Muharam - 13525091 
+3. Muhammad Pandu Pulunggana - 13525059 
+4. Kevin Lincoln Hutabarat - 13525101
