@@ -549,13 +549,13 @@ cekTantang(A, Count, Out):-
 cekTantang(_,Count,Count).
 
 
-    count(X,Sum),
-    Sum =:= 2,
-    !,
-    write(C), write('. uni'), nl,
-    Out is C+1.
-cekUni(_,C,C).
 cekUni(X,C1,C2,Out):-
+    count(X,N),
+    N =:= 2,
+    C1 =:= 2,
+    write(C2), write('. uni'), nl,
+    Out is C2+1.
+cekUni(_,_,C,C).
 
 
 cekTangkap(O2):-
