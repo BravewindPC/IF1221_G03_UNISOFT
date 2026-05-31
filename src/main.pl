@@ -549,13 +549,13 @@ cekTantang(A, Count, Out):-
 cekTantang(_,Count,Count).
 
 
-cekUni(X,C, Out):-
     count(X,Sum),
     Sum =:= 2,
     !,
     write(C), write('. uni'), nl,
     Out is C+1.
 cekUni(_,C,C).
+cekUni(X,C1,C2,Out):-
 
 
 cekTangkap(O2):-
@@ -1068,6 +1068,7 @@ godsHand :-
 
 cekGodshand(O3) :-
     \+statusEfek(on),
+    jumlahPemain(N),
+    \+semuaSatuKartu(N),
     write(O3), write('. godshand'), nl.
-cekGodshand(_):-
-    statusEfek(on).
+cekGodshand(_).
