@@ -33,10 +33,11 @@ numberCek(9).
 
 append_element([],E,[E]).
 append_element([Head|Tail], Element, [Head|NewTail]):- append_element(Tail, Element, NewTail).
-
+/* Dari Handbook */
 
 get_element([Element|_], 0, Element).
 get_element([_|Tail], Index, Element) :- Index > 0, NI is Index - 1, get_element(Tail, NI, Element).
+/* Dari Handbook */
 
 cek_pemain(X, X) :- 
     X >= 2, 
@@ -590,11 +591,13 @@ ambilTail([],[]).
 ambilTail([H],H).
 ambilTail([_|T], Tail):-
     ambilTail(T,Tail).
+/* Dari Edunex */
 
 removeTail([],[]).
 removeTail([_],[]).
 removeTail([H|T],[H|O1]):-
     removeTail(T,O1).
+/* Dari Edunex */
     
 reversePutarGiliran:-
     urutanGiliran(R1),
@@ -718,6 +721,7 @@ merge([A|Ra],[B|Rb],[A|M]):-
 merge([A|Ra],[B|Rb],[B|M]):-   
     A > B, 
     merge([A|Ra],Rb,M).
+/* Referensi: https://www.tutorialspoint.com/prolog/prolog_list_mergesort.htm */
 
 point_list(X, [X1]):- X is 1, !, listpemain(X, N, _, _), poin(N, P), X1 is P.
 point_list(X, [A|B]):- 
@@ -1039,14 +1043,18 @@ godsHand:-
 godsHand :-
     jumlahPemain(N),
     semuaSatuKartu(N), !,
-    write('Semua pemain hanya memiliki 1 kartu, Tidak bisa digunakan.'), nl.
+    write('Semua pemain hanya memiliki 1 kartu, WOWOK tidak mau ikut campur.'), nl.
 godsHand :-
     random(0, 100, Roll),
     Roll >= 20, !,
-    write('Hmmm.. mungkin belum saatnya Tuhan berkehendak.'), nl.
+    write('Hmmm.. mungkin kamu adalah ANTEK ASING sehingga WOWOK tidak berkehendak untuk membantumu.'), nl,
+    putarGiliran,
+    urutanGiliran([NextId|_]),
+    listpemain(NextId, NamaNext, _, _),
+    write('Giliran '), write(NamaNext), write('.'), nl.
 godsHand :-
     jumlahPemain(N),
-    write('Tuhan telah berkehendak.'), nl,
+    write('WOWOK telah berkehendak.'), nl,
     pilihPemainAcakDenganKartu(N, IdAsal),
     listpemain(IdAsal, _, KAsal, _),
     count(KAsal, JmlKartu),
