@@ -615,7 +615,7 @@ perhitunganpoint_extra([A], Nama):-
     (A == 'wild' -> A1 is 20; true),
     write(A1), write(' = '),
     poin(Nama, X),
-    write(X), write(' poin'), nl.
+    write(X), write(' poin').
 perhitunganpoint_extra([A], Nama):-
     numberCek(A),
     (A is 0 -> write(1); write(A)),
@@ -1039,14 +1039,14 @@ godsHand:-
 godsHand :-
     jumlahPemain(N),
     semuaSatuKartu(N), !,
-    write('Semua pemain hanya memiliki 1 kartu, WOWOK tidak mau ikut campur.'), nl.
+    write('Semua pemain hanya memiliki 1 kartu, Tidak bisa digunakan.'), nl.
 godsHand :-
     random(0, 100, Roll),
     Roll >= 20, !,
-    write('Hmmm.. mungkin kamu adalah ANTEK ASING sehingga WOWOK tidak berkehendak untuk membantumu.'), nl.
+    write('Hmmm.. mungkin belum saatnya Tuhan berkehendak.'), nl.
 godsHand :-
     jumlahPemain(N),
-    write('WOWOK telah berkehendak.'), nl,
+    write('Tuhan telah berkehendak.'), nl,
     pilihPemainAcakDenganKartu(N, IdAsal),
     listpemain(IdAsal, _, KAsal, _),
     count(KAsal, JmlKartu),
@@ -1057,9 +1057,6 @@ godsHand :-
     urutanGiliran([NextId|_]),
     listpemain(NextId, NamaNext, _, _),
     write('Giliran '), write(NamaNext), write('.'), nl.
-
-
-wowoksHand :- write('yu no boll'), nl, godsHand.
 
 cekGodshand(O3) :-
     \+statusEfek(on),
