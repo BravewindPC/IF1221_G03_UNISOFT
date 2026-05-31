@@ -508,7 +508,6 @@ listkosong([],[_|_],0).
 listkosong([_|_],[_|_],0).
 
 
-ceksalah(1).
 cekSemuaKartu(_,_,_,_,N,N):- !, ceksalah(0).
 cekSemuaKartu(A,B,X,Y,Count,N):-
     get_element(X,Count,X1),
