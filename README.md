@@ -1,6 +1,6 @@
 # IF1221_G03_UNISOFT
 
-Gambaran singkat: Unisoft merupakan simulasi permainan kartu UNI yang mirip dengan permainan UNO. Permainan ini bisa dimainkan oleh 2 - 4 orang. Dalam permainan ini ada kartu angka dari 0 - 9 dan kartu aksi seperti skip, reverse, drawtwo, wild, dan wilddrawfour.
+Gambaran singkat: Unisoft merupakan simulasi permainan kartu UNI yang mirip dengan permainan UNO. Permainan ini bisa dimainkan oleh 2 - 4 orang. Dalam permainan ini ada kartu angka dari 0 - 9 dan kartu aksi seperti skip, reverse, drawtwo, wild, dan wilddrawfour. Permainan berakhir jika ada salah satu pemain yang berhasil menghabiskan kartu mereka.
 
 Fitur utama: 
 
