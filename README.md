@@ -1,9 +1,12 @@
 # IF1221_G03_UNISOFT
 
-Gambaran singkat: Unisoft merupakan simulasi permainan kartu UNI yang mirip dengan permainan UNO. Permainan ini bisa dimainkan oleh 2 - 4 orang. Dalam permainan ini ada kartu angka dari 0 - 9 dan kartu aksi seperti skip, reverse, drawtwo, wild, dan wilddrawfour. Permainan berakhir jika ada salah satu pemain yang berhasil menghabiskan kartu mereka.
+# Gambaran singkat: 
+Unisoft merupakan simulasi permainan kartu UNI yang mirip dengan permainan UNO. Permainan ini bisa dimainkan oleh 2 - 4 orang. Dalam permainan ini ada kartu angka dari 0 - 9 dan kartu aksi seperti skip, reverse, drawtwo, wild, dan wilddrawfour. Permainan berakhir jika ada salah satu pemain yang berhasil menghabiskan kartu mereka.
 
-Fitur utama: 
+# Cara menjalankan:
+Cara menjalankan: Untuk menjalankan pertama kali, klik main.pl dan ketik startGame untuk memulai permainan. Jika sebelumnya anda telah saveGame pada permainan selanjutnya, bisa menekan ulang main.pl dan ketik loadGame untuk melanjutkan permainan
 
+# Fitur utama: 
 1. Startgame
 2. mainkanKartu
 3. ambilkartu
@@ -18,8 +21,7 @@ Fitur utama:
 12. savegame
 13. godshand
 
-Anggota Kelompok:
-
+# Anggota Kelompok:
 1. Bayu Palamarta Wirawan - 13525085 
 2. Muhammad Fauzi Muharam - 13525091 
 3. Muhammad Pandu Pulunggana - 13525059 
